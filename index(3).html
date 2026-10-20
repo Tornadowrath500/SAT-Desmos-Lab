@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAT Desmos Studio</title>
+<meta name="description" content="Learn to use Desmos on the digital SAT: interactive lessons, shortcuts, practice, and a live calculator. Free, no login.">
+<script src="https://www.desmos.com/api/v1.11/calculator.js?apiKey=4435f284d2154cf48e80abbbffc842cd"></script>
+<script>window.Desmos||document.write('<script src="https://www.desmos.com/api/v1.11/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"><\/script>')</script>
+<style>
+:root{--hd:#212121;--blue:#004D96;--blue2:#00366D;--bg:#F4F5F6;--bd:#C1C6C8;--tx:#1C1C1C;--mu:#595959;--ok:#188038;--bad:#c5221f;--card:#fff;--pb:#e8f0fa}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:15px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+button{font:inherit;cursor:pointer}
+header{height:52px;background:var(--hd);color:#fff;display:flex;align-items:center;gap:20px;padding:0 18px}
+header b{font-weight:600;letter-spacing:.3px}
+header .sp{flex:1}
+.mode button{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;padding:5px 12px;border-radius:6px}
+.mode button[aria-pressed=true]{background:#fff;color:var(--hd)}
+#streak{font-size:13px;background:rgba(255,255,255,.12);padding:4px 12px;border-radius:20px}
+#app{display:grid;grid-template-columns:minmax(340px,430px) 1fr;height:calc(100vh - 52px)}
+#side{display:flex;flex-direction:column;min-height:0;background:var(--card);border-right:1px solid var(--bd)}
+.tabs{display:flex;border-bottom:1px solid var(--bd)}
+.tabs button{flex:1;background:none;border:0;border-bottom:3px solid transparent;padding:12px 4px;color:var(--mu);font-weight:600}
+.tabs button[aria-selected=true]{color:var(--blue);border-color:var(--blue)}
+.pane{flex:1;overflow:auto;padding:18px;display:none}
+.pane.on{display:block}
+h2{font-size:18px;margin:0 0 4px}
+.sub{color:var(--mu);margin:0 0 14px;font-size:14px}
+.card{border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--card)}
+.lesson{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:var(--card);color:var(--tx)}
+.lesson:hover{border-color:var(--blue)}
+.lesson small{color:var(--mu);display:block}
+.pill{font-size:12px;font-weight:600;color:var(--blue);background:var(--pb);padding:2px 9px;border-radius:12px;white-space:nowrap}
+.pill.d{color:var(--ok);background:#e6f4ea}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:7px 14px;font-weight:600}
+.btn:hover{background:var(--blue2)}
+.btn.g{background:var(--card);color:var(--blue);border:1px solid var(--blue)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.step{display:flex;gap:10px;padding:10px 0;border-top:1px solid #e3e5e7;opacity:.55}
+.step.cur{opacity:1}
+.step.done{opacity:1}
+.step .n{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--bd);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step.cur .n{border-color:var(--blue);color:var(--blue)}
+.step.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.step .t{font-weight:600}
+.step .d{color:var(--mu);font-size:14px}
+.ask{display:flex;gap:6px;margin-top:8px}
+input[type=text],input[type=search]{font:inherit;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;min-width:0;flex:1;background:var(--card);color:var(--tx)}
+input:focus{outline:2px solid rgba(0,77,150,.35)}
+.fb{font-size:13px;min-height:1.2em;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+kbd{font:600 13px ui-monospace,Menlo,Consolas,monospace;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-bottom-width:2px;border-radius:5px;padding:1px 7px}
+.sc{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #e3e5e7}
+.sc .d{color:var(--mu);font-size:13px}
+.grp{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin:18px 0 0}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--pb);color:var(--blue)}
+.q{font-size:17px;margin:10px 0}
+.hint{font-size:14px;color:var(--mu);border-left:3px solid var(--bd);padding-left:10px;margin-top:10px}
+#calcWrap{position:relative;min-height:0}
+#calc,#sat{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+#sat{display:none}
+body.sat #calc{visibility:hidden}
+body.sat #sat{display:block}
+body.sat #side{display:none}
+body.sat #app{grid-template-columns:1fr}
+#tb{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;gap:6px}
+#tb .btn{box-shadow:0 2px 6px rgba(0,0,0,.2)}
+@media(max-width:820px){#app{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 60vh;height:auto;min-height:calc(100vh - 52px)}#side{border-right:0;border-bottom:1px solid var(--bd);max-height:75vh}#calcWrap{height:60vh}}
+select{font:inherit;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--tx);margin-bottom:12px}
+#dk,.hb{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;padding:5px 10px;border-radius:6px}
+#warn{background:#fdecea;color:#8a1c14;padding:8px 18px;font-size:14px}
+body.dark{--bg:#0f1318;--card:#171c23;--tx:#e8eaed;--mu:#9aa0a6;--bd:#2b323c;--blue:#6fa8f0;--blue2:#8ab8f5;--pb:#25354a}
+body.dark .btn:not(.g){color:#0b1b2e}
+header{border-bottom:1px solid rgba(255,255,255,.08)}
+header b::before{content:"SAT";background:#fff;color:var(--hd);font-size:11px;padding:2px 6px;border-radius:4px;margin-right:8px;font-weight:800}
+#side{box-shadow:2px 0 12px rgba(0,0,0,.08)}
+.pane{padding:20px 20px 40px;scrollbar-width:thin}
+.card{border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:14px 16px}
+.btn{border-radius:8px;transition:background .15s,transform .05s}.btn:active{transform:scale(.97)}
+.btn.g:hover{background:var(--pb)}
+.bar{height:6px;border-radius:3px;background:var(--bd);margin:8px 0 16px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);transition:width .4s}
+.sol{margin:12px 0 0;padding-left:20px;font-size:14px}.sol li{margin:6px 0}
+.acc{font-size:12px;color:var(--mu);margin-left:6px}
+.step.done:not(.cur) .t{color:var(--mu)}
+.tabs button:hover{background:var(--pb)}
+#calc,#sat{background:var(--card)}
+#dk{margin-left:0}.hb[aria-pressed=true]{background:#fff;color:var(--hd)}
+.tabs button{font-size:14px}
+.pop{position:fixed;z-index:50;min-width:300px;min-height:260px;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 36px rgba(0,0,0,.45);overflow:hidden;resize:both;display:flex;flex-direction:column;max-width:98vw;max-height:96vh}
+.pop[hidden]{display:none}.pop.mini{height:38px!important;min-height:0;resize:none}
+.ph{height:38px;flex:none;background:var(--hd);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 12px;cursor:grab;touch-action:none;user-select:none}
+.ph button{background:none;border:0;color:#fff;font-size:18px;width:30px;height:28px;border-radius:6px}.ph button:hover{background:rgba(255,255,255,.18)}
+.pb{flex:1;min-height:0;overflow:auto}.pb iframe{width:100%;height:calc(100% - 12px);border:0;display:block;background:#fff}
+.drag iframe{pointer-events:none}
+.ref{margin:0;padding:12px 16px 20px;list-style:none;font-size:14px}.ref li{padding:7px 0;border-bottom:1px solid var(--bd)}.ref b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:10px;border:0}
+@media(max-width:820px){.pop{left:0!important;right:0!important;top:auto!important;bottom:0;width:100%!important;height:72vh!important;resize:none;border-radius:12px 12px 0 0}}
+</style>
+</head>
+<body class="dark">
+<header>
+  <b>SAT Desmos Studio</b>
+  <span id="streak">Solved: 0</span>
+  <span class="sp"></span>
+  <button class="hb" id="bc" aria-pressed="false" title="Alt + C">🧮 Calculator</button>
+  <button class="hb" id="br" aria-pressed="false">Reference</button>
+  <button id="dk">☾ Dark</button>
+  <div class="mode" role="group" aria-label="Calculator mode">
+    <button id="mWork" aria-pressed="true">Study workspace</button>
+    <button id="mSat" aria-pressed="false">Official (full screen)</button>
+  </div>
+</header>
+<div id="app">
+  <aside id="side">
+    <div class="tabs" role="tablist">
+      <button data-p="learn" aria-selected="true">Learn</button>
+      <button data-p="keys" aria-selected="false">Shortcuts</button>
+      <button data-p="prac" aria-selected="false">Practice</button>
+      <button data-p="mast" aria-selected="false">Mastery</button>
+    </div>
+    <section class="pane on" id="p-learn"></section>
+    <section class="pane" id="p-keys"></section>
+    <section class="pane" id="p-prac"></section>
+    <section class="pane" id="p-mast"></section>
+  </aside>
+  <div id="calcWrap">
+    <div id="calc"></div>
+    <iframe id="sat" title="Official SAT Desmos calculator" src="about:blank" allow="clipboard-write"></iframe>
+    <div id="tb"><button class="btn g" id="clr">Clear graph</button></div>
+  </div>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), pick=a=>a[ri(0,a.length-1)];
+const store={get:()=>{try{return JSON.parse(localStorage.getItem('satdesmos'))||{}}catch(e){return{}}},set:o=>{try{localStorage.setItem('satdesmos',JSON.stringify(o))}catch(e){}}};
+let S=store.get(); S.done=S.done||{}; S.solved=S.solved||0;
+const save=()=>store.set(S);
+
+/* Calculator (SAT-style: keypad, no extras) */
+const HAS=typeof Desmos!=='undefined';const noop=()=>{};let calc;
+try{calc=Desmos.GraphingCalculator($('#calc'),{keypad:true,settingsMenu:true,expressionsTopbar:true,zoomButtons:true,pointsOfInterest:true,trace:true,border:false,lockViewport:false})}catch(e){calc={setBlank:noop,setExpressions:noop,setExpression:noop,setMathBounds:noop,getExpressions:()=>[],observeEvent:noop,resize:noop,updateSettings:noop}}
+const exprs=()=>calc.getExpressions();
+const latexes=()=>exprs().filter(e=>e.type==='expression').map(e=>(e.latex||'').replace(/\s|\\left|\\right/g,''));
+const hasTable=()=>exprs().some(e=>e.type==='table');
+function load(list,view){calc.setBlank();calc.setExpressions(list.map((e,i)=>typeof e==='string'?{id:'e'+i,latex:e}:e));if(view)calc.setMathBounds(view);}
+$('#clr').onclick=()=>calc.setBlank();
+
+/* Mode toggle: study workspace vs the official College Board embed */
+function mode(sat){document.body.classList.toggle('sat',sat);$('#mSat').setAttribute('aria-pressed',sat);$('#mWork').setAttribute('aria-pressed',!sat);$('#tb').style.display=sat?'none':'flex';
+ if(sat&&$('#sat').src==='about:blank')$('#sat').src='https://www.desmos.com/testing/collegeboard/graphing';if(!sat)calc.resize();}
+$('#mSat').onclick=()=>mode(true);$('#mWork').onclick=()=>mode(false);
+
+/* Tabs */
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));$$('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p))});
+
+/* ---------- LEARN ---------- */
+const pts=[[1,3.2],[2,4.9],[3,7.1],[4,9.2],[5,10.8],[6,13.1]];
+const n=pts.length,sx=pts.reduce((a,p)=>a+p[0],0),sy=pts.reduce((a,p)=>a+p[1],0),sxy=pts.reduce((a,p)=>a+p[0]*p[1],0),sxx=pts.reduce((a,p)=>a+p[0]*p[0],0);
+const M=(n*sxy-sx*sy)/(n*sxx-sx*sx),B=(sy-M*sx)/n;
+const tbl={type:'table',id:'t',columns:[{latex:'x_1',values:pts.map(p=>''+p[0])},{latex:'y_1',values:pts.map(p=>''+p[1])}]};
+const LESSONS=[
+{id:'reg',t:'Regression',s:'Fit a line to data in seconds',steps:[
+ {t:'Load the data',d:'A table of data points is on the graph. Tap Load data, then look at the points.',set:()=>load([tbl],{left:-1,right:9,bottom:-2,top:16}),btn:'Load data',check:()=>hasTable()},
+ {t:'Run a regression',d:'Click a new expression line and type <kbd>y_1~mx_1+b</kbd> (the <kbd>~</kbd> key is next to 1). Desmos fits the line for you.',check:()=>latexes().some(l=>/\\sim/.test(l))},
+ {t:'Read the slope',d:'What is m, rounded to the nearest tenth? Look in the regression box under your equation.',ask:{a:M,tol:.06}},
+ {t:'Make a prediction',d:'Use your line to predict y when x = 10. Type 10 into your formula or just compute it.',ask:{a:M*10+B,tol:.3}}]},
+{id:'sys',t:'Systems of equations',s:'The intersection is the answer',steps:[
+ {t:'Graph both lines',d:'Load the two equations.',set:()=>load(['y=2x+1','y=-x+7'],{left:-3,right:9,bottom:-3,top:10}),btn:'Load system',check:()=>latexes().length>=2},
+ {t:'Find the intersection',d:'Tap the dot where the lines cross. What is the x-coordinate?',ask:{a:2}},
+ {t:'Check the y-value',d:'What is the y-coordinate of the solution?',ask:{a:5}}]},
+{id:'quad',t:'Quadratics',s:'Roots and vertex without algebra',steps:[
+ {t:'Graph the parabola',d:'Load y = x² − 2x − 8.',set:()=>load(['y=x^2-2x-8'],{left:-6,right:8,bottom:-12,top:8}),btn:'Load parabola',check:()=>latexes().length>=1},
+ {t:'Tap the x-intercepts',d:'What is the positive solution of x² − 2x − 8 = 0?',ask:{a:4}},
+ {t:'Tap the vertex',d:'What is the minimum value of y?',ask:{a:-9}}]},
+{id:'ineq',t:'Inequalities',s:'Shaded regions and test points',steps:[
+ {t:'Graph the region',d:'Load two inequalities. The overlap of the shading is the solution set.',set:()=>load(['y>2x-3','y<-x+6'],{left:-4,right:8,bottom:-6,top:8}),btn:'Load inequalities',check:()=>latexes().length>=2},
+ {t:'Find the corner',d:'The boundary lines meet at a corner. What is its x-coordinate?',ask:{a:3}},
+ {t:'Test a point',d:'Type the point (4,0) in a new line. Is it inside the overlap? Enter 1 for yes, 0 for no.',ask:{a:1}}]},
+{id:'circ',t:'Circles',s:'Center and radius from the equation',steps:[
+ {t:'Graph the circle',d:'Load (x − 2)² + (y + 1)² = 25.',set:()=>load(['(x-2)^2+(y+1)^2=25'],{left:-9,right:13,bottom:-9,top:9}),btn:'Load circle',check:()=>latexes().length>=1},
+ {t:'Read the radius',d:'How long is the radius? Use the graph, or take the square root of 25.',ask:{a:5}},
+ {t:'Read the center',d:'What is the y-coordinate of the center? Watch the sign.',ask:{a:-1}}]},
+{id:'stat',t:'Statistics',s:'Mean, median, standard deviation',steps:[{t:'Enter a list',d:'Type <kbd>L=[4,8,15,16,23,42]</kbd> on a new line.',check:()=>latexes().some(l=>/^L=\[/.test(l))},{t:'Find the mean',d:'Type <kbd>mean(L)</kbd>. What is the result?',ask:{a:18}},{t:'Find the median',d:'Type <kbd>median(L)</kbd>. What is the result?',ask:{a:15.5}}]},
+{id:'sld',t:'Sliders',s:'Explore how m and b change a line',steps:[
+ {t:'Type a slider equation',d:'Type <kbd>y=mx+b</kbd>. Desmos offers to add sliders. Click All.',check:()=>latexes().some(l=>/^y=mx\+b/.test(l)||/^y=m\*?x\+b/.test(l))},
+ {t:'Match a target',d:'Drag the sliders until the line passes through (0,3) and (2,7). What is m?',ask:{a:2}}]}
+];
+let cur=null,stepI=0;
+const fb=(m,ok)=>{const f=$('#fb');if(f){f.textContent=m;f.className='fb '+(ok?'ok':'no')}};
+function lessonList(){cur=null;const p=$('#p-learn');
+ p.innerHTML='<h2>Interactive lessons</h2><div class="bar"><i style="width:'+Math.round(LESSONS.reduce((a,l)=>a+Math.min(S.done[l.id]||0,l.steps.length),0)*100/LESSONS.reduce((a,l)=>a+l.steps.length,0))+'%"></i></div><p class="sub">Pick a lesson. Each step loads the graph for you and checks your work as you go.</p>'+
+ LESSONS.map((l,i)=>{const d=S.done[l.id]||0,tot=l.steps.length;return `<button class="card lesson" data-i="${i}"><span><b>${l.t}</b><small>${l.s}</small></span><span class="pill ${d>=tot?'d':''}">${d>=tot?'Done':d+'/'+tot}</span></button>`}).join('')+'<div class="row"><button class="btn g" id="rst">Reset progress</button></div>';
+ $('#rst').onclick=()=>{if(confirm('Reset all lesson progress?')){S.done={};save();lessonList()}};$$('.lesson',p).forEach(b=>b.onclick=()=>openLesson(+b.dataset.i));}
+function openLesson(i){cur=LESSONS[i];stepI=Math.min(S.done[cur.id]||0,cur.steps.length-1);if(S.done[cur.id]>=cur.steps.length)stepI=0;calc.setBlank();render();runSet();}
+function go(i){stepI=Math.max(0,Math.min(cur.steps.length-1,i));render();runSet()}
+function runSet(){const s=cur.steps[stepI];if(s.set&&!s.btn)s.set();}
+function render(){const p=$('#p-learn'),done=S.done[cur.id]||0;
+ p.innerHTML=`<button class="btn g" id="back">← All lessons</button><h2 style="margin-top:14px">${cur.t}</h2><p class="sub">Step ${Math.min(stepI+1,cur.steps.length)} of ${cur.steps.length}</p>`+
+ cur.steps.map((s,i)=>`<div class="step ${i<done?'done':''} ${i===stepI?'cur':''}" data-i="${i}"><div class="n">${i<done?'✓':i+1}</div><div><div class="t">${s.t}</div>${i===stepI?`<div class="d">${s.d}</div>${s.btn?`<div class="row"><button class="btn" id="go">${s.btn}</button></div>`:''}${s.ask?'<div class="ask"><input type="text" id="ans" inputmode="decimal" placeholder="Your answer"><button class="btn" id="chk">Check</button></div>':''}<div class="fb" id="fb"></div><div class="row"><button class="btn g" id="bk" ${stepI?'':'disabled'}>← Back</button><button class="btn g" id="nx" ${stepI>=cur.steps.length-1?'disabled':''}>${stepI<done?'Next →':'Skip step'}</button></div>`:''}</div></div>`).join('')+
+ (done>=cur.steps.length?'<div class="card" style="margin-top:12px"><b>Lesson complete.</b> Try the Practice tab next.</div>':'');
+ $('#back').onclick=lessonList;
+ $$('.step',p).forEach(e=>{const i=+e.dataset.i;if(i<=done&&i!==stepI){e.style.cursor='pointer';e.title='Go back to this step';e.onclick=()=>go(i)}});$('#bk').onclick=()=>go(stepI-1);$('#nx').onclick=()=>go(stepI+1);
+ const g=$('#go');if(g)g.onclick=()=>{cur.steps[stepI].set();g.textContent='Loaded ✓';if(cur.steps[stepI].check&&!cur.steps[stepI].ask)setTimeout(poll,150)};
+ const c=$('#chk');if(c){const f=()=>{const v=parseFloat($('#ans').value.replace('−','-')),a=cur.steps[stepI].ask;if(Math.abs(v-a.a)<=(a.tol||.01))advance();else fb('Not quite. Check the graph and try again.',false)};c.onclick=f;$('#ans').onkeydown=e=>{if(e.key==='Enter')f()}}}
+function advance(){fb('Correct!',true);S.done[cur.id]=Math.max(S.done[cur.id]||0,stepI+1);save();stepI++;setTimeout(()=>{if(stepI>=cur.steps.length){stepI=cur.steps.length-1;confetti()}render();if(S.done[cur.id]<cur.steps.length)runSet()},650)}
+function confetti(){const c=document.createElement('canvas');c.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:99';c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const g=c.getContext('2d'),P=[...Array(90)].map(()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:Math.random()*-12-2,c:`hsl(${Math.random()*360},80%,55%)`,r:Math.random()*6+3}));let t=0;(function f(){g.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;g.fillStyle=p.c;g.fillRect(p.x,p.y,p.r,p.r)});if(++t<90)requestAnimationFrame(f);else c.remove()})()}
+function poll(){if(!cur)return;const s=cur.steps[stepI];if(s&&s.check&&!s.ask&&(S.done[cur.id]||0)===stepI&&s.check())advance()}
+calc.observeEvent('change',()=>setTimeout(poll,100));
+lessonList();
+
+/* ---------- SHORTCUTS ---------- */
+const KEYS=[
+['Typing',[['/','Fraction','\\frac{1}{2}+\\frac{1}{3}'],['^','Exponent. Press → to leave the power','x^2'],['sqrt','Square root','y=\\sqrt{x}'],['pi','π symbol','y=\\pi x'],['abs(','Absolute value','y=\\left|x-2\\right|'],['<= or >=','Type ≤ and ≥','y\\le x+1'],['_','Subscript, such as x₁','x_1'],['theta','θ symbol','\\theta']]],
+['Regression and data',[['y_1~mx_1+b','Linear regression from a table','y_1\\sim mx_1+b'],['y_1~ax_1^2+bx_1+c','Quadratic regression','y_1\\sim ax_1^2+bx_1+c'],['y_1~ae^{bx_1}','Exponential regression','y_1\\sim ae^{bx_1}']]],
+['Graph tricks',[['Tap a curve','Shows intersections, intercepts, and vertices as gray dots. Tap one for its coordinates',null],['Type a point','Enter (3,4) to plot it and test it against a region','(3,4)'],['Restrict a domain','Add {0<x<5} after an equation','y=x^2\\left\\{0<x<5\\right\\}'],['Add sliders','Use letters like a, b, m. Click All when prompted','y=a(x-h)^2+k'],['Zoom to fit','Use the wrench icon, then Zoom Fit, or pinch to zoom',null],['Compare curves','Graph two equations, then tap where they meet','y=x^2']]]
+];
+KEYS.push(['Statistics in Desmos',[['mean(L)','Average of a list','\\operatorname{mean}\\left(\\left[4,8,15\\right]\\right)'],['median(L)','Middle value','\\operatorname{median}\\left(\\left[4,8,15,20\\right]\\right)'],['stdev(L)','Standard deviation','\\operatorname{stdev}\\left(\\left[4,8,15\\right]\\right)']]],
+['Test-day tips',[['Alt + 1 to 4','Switch between the four tabs',null],['Alt + C','Open or close the popup calculator',null],['Check degrees','Trig answers need the right mode. Open the wrench menu',null],['Parallel lines','No solution means the lines never cross; infinite means they overlap',null],['Verify','Plug your answer back in. Desmos makes this fast',null]]],
+['SAT reference sheet',[['A = πr²','Circle area. C = 2πr',null],['V = πr²h','Cylinder volume',null],['a² + b² = c²','Right triangles. Special: x, x√3, 2x and x, x, x√2',null],['s = (θ/360)·2πr','Arc length. Sector area uses πr² the same way',null],['2π radians = 360°','Angle conversion',null]]]);
+$('#p-keys').innerHTML='<h2>Shortcuts and tricks</h2><p class="sub">Tap Try to drop an example on the graph.</p><input type="search" id="ks" placeholder="Search shortcuts" aria-label="Search shortcuts">'+KEYS.map(([g,l])=>`<div class="grp">${g}</div>`+l.map(([k,d,e])=>`<div class="sc" data-s="${(k+d).toLowerCase()}"><div><kbd>${k}</kbd><div class="d">${d}</div></div>${e?`<button class="btn g" data-e="${encodeURIComponent(e.trim())}">Try</button>`:''}</div>`).join('')).join('');
+$$('#p-keys [data-e]').forEach(b=>b.onclick=()=>{mode(false);calc.setExpression({id:'try',latex:decodeURIComponent(b.dataset.e)})});
+$('#ks').oninput=e=>$$('#p-keys .sc').forEach(r=>r.style.display=r.dataset.s.includes(e.target.value.toLowerCase())?'':'none');
+
+/* ---------- PRACTICE ---------- */
+const sg=n=>n<0?'−':'+',ab=Math.abs,nz=(a,b)=>{let v=0;while(!v)v=ri(a,b);return v};
+const GEN=[
+{tag:'Regression',f:()=>{const m=nz(-4,5),b=ri(-6,6),x=ri(6,9),P=[1,2,3,4].map(i=>[i,m*i+b]),a=m*x+b;return{q:`The table shows data that lie exactly on a line: ${P.map(p=>`(${p[0]}, ${p[1]})`).join(', ')}. What is the value of y when x = ${x}?`,a,set:[{type:'table',id:'t',columns:[{latex:'x_1',values:P.map(p=>''+p[0])},{latex:'y_1',values:P.map(p=>''+p[1])}]},'y_1\\sim mx_1+b'],h:'Enter the points in a table, type y_1~mx_1+b, then plug in x.',sol:['In Desmos, create a table with the four points.','Type y_1~mx_1+b. Desmos reports m = '+m+' and b = '+b+'.',`Plug in: y = ${m}(${x}) ${sg(b)} ${ab(b)} = ${a}.`]}}},
+{tag:'Systems',f:()=>{const x=ri(-3,5),y=ri(-3,6),a=ri(1,4),c=ri(2,5);return{q:`${a}x + ${c}y = ${a*x+c*y} and x − y = ${x-y}. What is the value of x?`,a:x,set:[`${a}x+${c}y=${a*x+c*y}`,`x-y=${x-y}`],h:'Type both equations and tap where the lines cross.',sol:['Type both equations into Desmos.',`Tap the intersection point: (${x}, ${y}).`,`The x-coordinate is ${x}.`]}}},
+{tag:'Systems',f:()=>{const a=ri(1,4),b=ri(2,5),m=ri(2,3);return{q:`${a}x + ${b}y = 7 and kx + ${b*m}y = 20. For what value of k does the system have no solution?`,a:a*m,set:[`${a}x+${b}y=7`,`${a*m}x+${b*m}y=20`],h:'No solution means parallel lines: same slope, different intercept.',sol:[`Multiply the first equation by ${m}: ${a*m}x + ${b*m}y = ${7*m}.`,`The y-coefficients now match, so k must equal ${a*m} for parallel lines.`,`Check: ${7*m} ≠ 20, so the lines never meet. k = ${a*m}.`]}}},
+{tag:'Linear',f:()=>{const x=ri(-5,6),a=ri(2,5),b=nz(-6,6),c=a*(x+b);return{q:`${a}(x ${sg(b)} ${ab(b)}) = ${c}. What is the value of x?`,a:x,set:[`y=${a}(x${b<0?'-':'+'}${ab(b)})`,`y=${c}`],h:'Divide first, then undo the add or subtract. Or graph both sides.',sol:[`Divide both sides by ${a}: x ${sg(b)} ${ab(b)} = ${c/a}.`,`${b<0?'Add':'Subtract'} ${ab(b)}: x = ${x}.`,'Check in Desmos: graph both sides and tap the intersection.']}}},
+{tag:'Quadratics',f:()=>{let r1=ri(-6,-1),r2=ri(1,7);if(r1+r2===0)r2++;const b=-(r1+r2),c=r1*r2;return{q:`What is the positive solution of x² ${sg(b)} ${ab(b)}x − ${ab(c)} = 0?`,a:r2,set:[`y=x^2+(${b})x+(${c})`],h:'Graph y = the left side and tap the x-intercepts.',sol:['Type y = the left side into Desmos.',`Tap the x-intercepts: ${r1} and ${r2}.`,`The positive one is ${r2}.`]}}},
+{tag:'Quadratics',f:()=>{const h=nz(-5,5),k=ri(-9,5),b=-2*h,c=h*h+k||1,m=c-h*h;return{q:`What is the minimum value of f(x) = x² ${sg(b)} ${ab(b)}x ${sg(c)} ${ab(c)}?`,a:m,set:[`y=x^2+(${b})x+(${c})`],h:'The minimum of an upward parabola is at its vertex.',sol:['Graph y = f(x).',`Tap the lowest point, the vertex: (${h}, ${m}).`,`The minimum value is the y-coordinate: ${m}.`]}}},
+{tag:'Circles',f:()=>{const h=ri(-5,5),k=ri(-5,5),r=ri(2,7);return{q:`A circle has equation (x ${sg(-h)} ${ab(h)})² + (y ${sg(-k)} ${ab(k)})² = ${r*r}. What is its radius?`,a:r,set:[`(x-(${h}))^2+(y-(${k}))^2=${r*r}`],h:'The right side is r².',sol:['Standard form is (x − h)² + (y − k)² = r².',`Here r² = ${r*r}.`,`r = √${r*r} = ${r}.`]}}},
+{tag:'Inequalities',f:()=>{const x=ri(-3,4),a=ri(1,4),b=ri(-4,4),c=(a+1)*x+b;return{q:`The boundaries y = ${a}x ${sg(b)} ${ab(b)} and y = −x ${sg(c)} ${ab(c)} form the corner of a shaded region. What is the x-coordinate of the corner?`,a:x,set:[`y>${a}x+(${b})`,`y<-x+(${c})`],h:'Graph both and tap where the boundary lines meet.',sol:['Type both inequalities into Desmos.',`Tap the point where the boundary lines cross: (${x}, ${a*x+b}).`,`The x-coordinate is ${x}.`]}}},
+{tag:'Exponential',f:()=>{const a=ri(2,5),b=pick([2,3]),n=ri(2,4);return{q:`An account holds $${a} and its value multiplies by ${b} every year. What is its value after ${n} years, in dollars?`,a:a*b**n,set:[`y=${a}\\cdot ${b}^x`,`${a}\\cdot ${b}^{${n}}`],h:'Model: start × factor^years.',sol:[`Model: value = ${a}·${b}^t.`,`At t = ${n}: ${a}·${b}^${n} = ${a}·${b**n}.`,`Answer: ${a*b**n}.`]}}},
+{tag:'Functions',f:()=>{const a=nz(-4,4),h=nz(-3,3),k=nz(-5,5),c=ri(-2,4),F=v=>v*v+a*v,an=F(c+h)+k;return{q:`f(x) = x² ${sg(a)} ${ab(a)}x. If g(x) = f(x ${sg(h)} ${ab(h)}) ${sg(k)} ${ab(k)}, what is g(${c})?`,a:an,set:[`f(x)=x^2+(${a})x`,`g(x)=f(x+(${h}))+(${k})`,`g(${c})`],h:'Define f and g in Desmos exactly as written, then type g(number).',sol:['Type f(x) and g(x) as separate lines.',`Type g(${c}) and read the result.`,`By hand: g(${c}) = f(${c+h}) + (${k}) = ${F(c+h)} + (${k}) = ${an}.`]}}},
+{tag:'Radicals',f:()=>{const a=nz(-5,8),b=ri(2,6),x=b*b-a;return{q:`If √(x ${sg(a)} ${ab(a)}) = ${b}, what is the value of x?`,a:x,set:[`y=\\sqrt{x+(${a})}`,`y=${b}`],h:'Square both sides, or graph each side and tap the intersection.',sol:[`Square both sides: x ${sg(a)} ${ab(a)} = ${b*b}.`,`x = ${b*b} − (${a}) = ${x}.`,'Check by substituting back, since squaring can add false answers.']}}},
+{tag:'Statistics',f:()=>{const d=[ri(2,30),ri(2,30),ri(2,30),ri(2,30)];let l=ri(2,30);while((d[0]+d[1]+d[2]+d[3]+l)%5)l++;d.push(l);const m=d.reduce((p,q)=>p+q)/5;return{q:`What is the mean of the data set ${d.join(', ')}?`,a:m,set:[`L=[${d}]`,'\\operatorname{mean}\\left(L\\right)'],h:'Desmos has a built-in mean.',sol:[`Type L=[${d}].`,'Type mean(L).',`Result: ${m}.`]}}},
+{tag:'Statistics',f:()=>{const d=[...new Set([...Array(12)].map(()=>ri(2,40)))].slice(0,5),t=[...d].sort((p,q)=>p-q);return{q:`What is the median of the data set ${d.join(', ')}?`,a:t[2],set:[`L=[${d}]`,'\\operatorname{median}\\left(L\\right)'],h:'Median = middle value after sorting.',sol:[`Sort: ${t.join(', ')}.`,'With five values, the median is the third.',`Median = ${t[2]}. (Or type median(L) in Desmos.)`]}}},
+{tag:'Percents and rates',f:()=>{const P=pick([40,60,80,120,200,250]),p=pick([10,20,25,30,40,50]),an=P*(100-p)/100;return{q:`A jacket costs $${P}. It is on sale for ${p}% off. What is the sale price, in dollars?`,a:an,set:[`${P}\\cdot ${(100-p)/100}`],h:'Price × (1 − discount).',sol:[`Discount = ${p}% of ${P} = ${P*p/100}.`,`Sale price = ${P} − ${P*p/100} = ${an}.`,`Shortcut: ${P} × ${(100-p)/100}.`]}}},
+{tag:'Percents and rates',f:()=>{const v=pick([30,45,50,60,75]),t=ri(2,4),T=t+ri(2,5);return{q:`A car travels ${v*t} miles in ${t} hours at a constant rate. At this rate, how many miles will it travel in ${T} hours?`,a:v*T,set:[`\\frac{${v*t}}{${t}}\\cdot ${T}`],h:'Find the rate first.',sol:[`Rate = ${v*t} ÷ ${t} = ${v} miles per hour.`,`Distance = ${v} × ${T} = ${v*T}.`]}}},
+{tag:'Probability',f:()=>{const T=pick([20,25,50]),b=ri(2,T/2),r=ri(1,T-b-1),g=T-b-r,an=b*100/T;return{q:`A bag has ${r} red, ${b} blue, and ${g} green marbles. One is chosen at random. What is the probability, as a percent, that it is blue?`,a:an,set:[`\\frac{${b}}{${T}}\\cdot 100`],h:'Favorable ÷ total.',sol:[`Total marbles = ${T}.`,`P(blue) = ${b}/${T} = ${an/100}.`,`As a percent: ${an}.`]}}},
+{tag:'Geometry',f:()=>{const [x,y,z]=pick([[3,4,5],[5,12,13],[8,15,17],[7,24,25]]),s=ri(1,3);return{q:`A right triangle has legs of length ${x*s} and ${y*s}. What is the length of its hypotenuse?`,a:z*s,set:[`\\sqrt{${x*s}^2+${y*s}^2}`],h:'Pythagorean theorem.',sol:[`c² = ${x*s}² + ${y*s}² = ${(x*s)**2+(y*s)**2}.`,`c = √${(x*s)**2+(y*s)**2} = ${z*s}.`]}}},
+{tag:'Geometry',f:()=>{const [r,t]=pick([[6,90],[12,60],[6,60],[12,90],[4,90],[12,120]]),k=r*r*t/360;return{q:`A circle has radius ${r}. A sector has a central angle of ${t}°. The sector area is kπ. What is k?`,a:k,set:[`\\frac{${t}}{360}\\cdot ${r}^2`],h:'Sector = (angle/360) × πr².',sol:[`Fraction of the circle = ${t}/360.`,`Area = (${t}/360)·π·${r}² = (${t}/360)·${r*r}π.`,`k = ${k}.`]}}},
+{tag:'Geometry',f:()=>{const r=ri(2,6),h=ri(2,9);return{q:`A cylinder has radius ${r} and height ${h}. Its volume is kπ. What is k?`,a:r*r*h,set:[`${r}^2\\cdot ${h}`],h:'V = πr²h.',sol:['V = πr²h.',`k = r²h = ${r}²·${h}.`,`k = ${r*r*h}.`]}}},
+{tag:'Geometry',f:()=>{const [o,h,s]=pick([[3,5,4],[5,13,2],[4,5,5],[8,17,2]]);return{q:`In a right triangle, sin A = ${o}/${h}. If the hypotenuse is ${h*s}, what is the length of the side opposite angle A?`,a:o*s,set:[`\\frac{${o}}{${h}}\\cdot ${h*s}`],h:'sin = opposite ÷ hypotenuse.',sol:['sin A = opposite ÷ hypotenuse.',`Opposite = (${o}/${h}) × ${h*s}.`,`= ${o*s}.`]}}}];
+const CH=[()=>{const m=ri(-3,3)||1,b=ri(-4,4),x1=ri(-3,0),x2=ri(1,4);return{q:`Graph the line through (${x1}, ${m*x1+b}) and (${x2}, ${m*x2+b}). Type it as y = …`,f:x=>m*x+b,h:'Plot both points, then use y=mx+b with sliders until the line passes through them.',sol:['Plot both points by typing them.','Slope = rise ÷ run between the points; the y-intercept is where x = 0.','Type y = mx + b with those values and check that it passes through both points.']}},
+()=>{const h=ri(-3,3),k=ri(-4,4),a=pick([1,2,-1]);return{q:`Graph the parabola with vertex (${h}, ${k}) that passes through (${h+1}, ${k+a}). Type it as y = …`,f:x=>a*(x-h)**2+k,h:'Try y=a(x-h)^2+k and set a, h, and k with sliders.',sol:['Vertex form is y = a(x − h)² + k with the vertex (h, k).','Plug the vertex into h and k.','Use the extra point to solve for a, or use a slider until the curve hits it.']}}];
+function evalL(l,x){let t=l.replace(/\\left|\\right/g,'').replace(/\\cdot/g,'*').replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g,'(($1)/($2))').replace(/[{}]/g,m=>m==='{'?'(':')').replace(/\^/g,'**').replace(/(\d|\))(x|\()/g,'$1*$2').replace(/x(\(|\d)/g,'x*$1').replace(/x(?=x)/g,'x*');return new Function('x','return '+t)(x)}
+function chalOK(f){const L=latexes().filter(l=>/^y=/.test(l)).map(l=>l.slice(2));return L.some(l=>{try{return[-3,-1,0,1,2,4].every(x=>Math.abs(evalL(l,x)-f(x))<1e-6)}catch(e){return false}})}
+let PM='prac',PT='All',P=null,sc=0,tl=0,tmr=null;
+const fmtT=t=>Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+function shell(inner){$('#p-prac').innerHTML=`<h2>Practice</h2><div class="row" style="margin:0 0 12px">${[['prac','Practice'],['sprint','Sprint (3 min)'],['chal','Graph challenge']].map(([k,l])=>`<button class="btn ${PM===k?'':'g'}" data-m="${k}">${l}</button>`).join('')}</div>${PM!=='chal'?`<select id="pt" aria-label="Topic">${['All',...new Set(GEN.map(g=>g.tag))].map(t=>`<option ${t===PT?'selected':''}>${t}</option>`).join('')}</select>`:''}<div>${inner}</div>`;
+ $$('#p-prac [data-m]').forEach(b=>b.onclick=()=>{PM=b.dataset.m;start()});const q=$('#pt');if(q)q.onchange=()=>{PT=q.value;start()}}
+function start(){clearInterval(tmr);if(PM==='sprint'){shell(`<div class="card"><b>Beat the clock.</b><p class="sub">Solve as many as you can in 3 minutes. Best score: ${S.best||0}</p><button class="btn" id="go2">Start sprint</button></div>`);$('#go2').onclick=()=>{sc=0;tl=180;tmr=setInterval(()=>{tl--;const e=$('#tm');if(e)e.textContent=fmtT(tl);if(tl<=0)endSprint()},1000);nextP()}}else nextP()}
+function endSprint(){clearInterval(tmr);const nb=sc>(S.best||0);if(nb){S.best=sc;save()}if(sc)confetti();shell(`<div class="card"><b>Time. You solved ${sc}.</b><p class="sub">${nb?'New personal best!':'Best: '+S.best}</p><button class="btn" id="go2">Go again</button></div>`);$('#go2').onclick=start}
+function nextP(){const ch=PM==='chal',pool=GEN.filter(g=>PT==='All'||g.tag===PT);if(ch){P=pick(CH)();P.tag='Challenge'}else{const g=pick(pool);P=g.f();P.tag=g.tag}
+ shell(`<div class="card"><span class="tag">${ch?'Graph challenge':P.tag}</span> <span class="acc">${(S.st&&S.st[P.tag])?'Accuracy '+S.st[P.tag][0]+'/'+S.st[P.tag][1]:''}</span>${PM==='sprint'?` <span class="pill" id="tm">${fmtT(tl)}</span>`:''}<div class="q">${P.q}</div>${ch?'':'<div class="ask"><input type="text" id="pa" inputmode="decimal" placeholder="Answer"><button class="btn" id="pc">Check</button></div>'}<div class="fb" id="pf"></div><div class="row">${ch?'<button class="btn" id="pc">Check my graph</button>':'<button class="btn g" id="ps">Show in Desmos</button>'}<button class="btn g" id="ph">Hint</button><button class="btn g" id="sl">Show solution</button><button class="btn g" id="pn">Skip</button></div><ol class="sol" id="sol"></ol><div class="hint" id="phint" hidden>${P.h}</div></div>`);
+ if(ch)calc.setBlank();const ps=$('#ps');if(ps)ps.onclick=()=>{mode(false);load(P.set)};
+ let k=0;$('#sl').onclick=()=>{const L=P.sol||[];if(k<L.length){$('#sol').insertAdjacentHTML('beforeend','<li>'+L[k++]+'</li>');$('#sl').textContent=k<L.length?'Next step':'Solution shown'}};
+ $('#ph').onclick=()=>$('#phint').hidden=false;$('#pn').onclick=nextP;
+ const chk=()=>{const f=$('#pf');let ok;if(ch)ok=chalOK(P.f);else{const v=parseFloat($('#pa').value.replace('−','-'));ok=Math.abs(v-P.a)<=.06}
+  const st=S.st=S.st||{},t=st[P.tag]=st[P.tag]||[0,0];t[1]++;if(ok)t[0]++;
+  if(ok){f.textContent='Correct!';f.className='fb ok';S.solved++;sc++;save();upd();if(ch)confetti();setTimeout(nextP,ch?1400:800)}else{f.textContent=ch?'That graph does not match yet. Check your points or take a hint.':'Not quite. Try the graph or take a hint.';f.className='fb no'}};
+ $('#pc').onclick=chk;const pa=$('#pa');if(pa)pa.onkeydown=e=>{if(e.key==='Enter')chk()}}
+const upd=()=>$('#streak').textContent='Solved: '+S.solved;
+function dark(on){document.body.classList.toggle('dark',on);calc.updateSettings({invertedColors:on});$('#dk').textContent=on?'☀ Light':'☾ Dark';S.dark=on;save()}
+$('#dk').onclick=()=>dark(!document.body.classList.contains('dark'));addEventListener('keydown',e=>{if(!e.altKey)return;if('1234'.includes(e.key))$$('.tabs button')[e.key-1].click();if(e.key==='c')toggle('calc')});
+
+/* ---------- POPUPS (calculator + reference) ---------- */
+const POPS={};let Z=60;
+function pop(id,btn,title,html,src,w,h,right){const d=document.createElement('div');d.className='pop';d.hidden=true;d.style.cssText=`width:${w}px;height:${h}px;right:${right}px;top:70px`;
+ d.innerHTML=`<div class="ph"><b>${title}</b><span><button data-a="min" title="Minimize" aria-label="Minimize">–</button><button data-a="x" title="Close" aria-label="Close">×</button></span></div><div class="pb">${src?`<iframe title="${title}" allow="clipboard-write"></iframe>`:html}</div>`;
+ document.body.appendChild(d);const ph=$('.ph',d);d.addEventListener('pointerdown',()=>d.style.zIndex=++Z);
+ ph.onpointerdown=e=>{if(e.target.closest('button'))return;const r=d.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;ph.setPointerCapture(e.pointerId);d.classList.add('drag');
+  ph.onpointermove=m=>{d.style.left=Math.max(0,Math.min(innerWidth-80,m.clientX-dx))+'px';d.style.top=Math.max(0,Math.min(innerHeight-40,m.clientY-dy))+'px';d.style.right='auto'};
+  ph.onpointerup=()=>{d.classList.remove('drag');ph.onpointermove=null}};
+ d.onclick=e=>{const a=e.target.dataset.a;if(a==='x')toggle(id,false);if(a==='min')d.classList.toggle('mini')};
+ $(btn).onclick=()=>toggle(id);POPS[id]={d,src,btn}}
+function toggle(id,on){const p=POPS[id];on=on===undefined?p.d.hidden:on;p.d.hidden=!on;p.d.classList.remove('mini');$(p.btn).setAttribute('aria-pressed',on);
+ if(on){p.d.style.zIndex=++Z;const f=$('iframe',p.d);if(f&&!f.getAttribute('src'))f.src=p.src}}
+pop('calc','#bc','Calculator',null,'https://www.desmos.com/testing/collegeboard/graphing',460,580,16);
+pop('ref','#br','Reference',`<ul class="ref"><b>Circles</b><li>A = πr²</li><li>C = 2πr</li><li>Arc length = (θ/360) · 2πr</li><b>Shapes</b><li>Rectangle: A = ℓw</li><li>Triangle: A = ½bh</li><li>Pythagorean: a² + b² = c²</li><li>30-60-90 sides: x, x√3, 2x</li><li>45-45-90 sides: x, x, x√2</li><b>Volume</b><li>Rectangular prism: V = ℓwh</li><li>Cylinder: V = πr²h</li><li>Sphere: V = (4/3)πr³</li><li>Cone: V = (1/3)πr²h</li><li>Pyramid: V = (1/3)ℓwh</li><b>Facts</b><li>A circle has 360° or 2π radians</li><li>Angles in a triangle sum to 180°</li></ul>`,null,340,520,500);
+
+/* ---------- MASTERY ---------- */
+const TRY=[];
+const MAST=[
+['Pacing and mindset',[['22 questions, 35 minutes per module','About 95 seconds each. If one stalls you past two minutes, flag it and move on.'],['Never leave a blank','There is no guessing penalty. Pick something, flag it, and come back.'],['Module 1 matters most','Strong accuracy early unlocks the harder second module, where top scores come from.'],['Read the last sentence first','It tells you what to solve for, so you do not answer the wrong question.']]],
+['Answer techniques',[['Backsolve','Multiple choice? Plug the choices into the equation, starting with a middle value.'],['Pick numbers','Variables in every choice? Substitute easy values like x = 2 and compare results.'],['Eliminate first','Rule out choices with the wrong sign, size, or units, even if you cannot fully solve it.'],['Match the graph','Graph the equation and see which choice fits the picture.'],['Grid-in rules','Fractions and decimals both work. Positive answers fit 5 characters, negative answers 6. Only round if told to.']]],
+['Desmos power moves',[
+ ['Solve any equation','Graph each side as its own y = line and tap the intersection. The x-value is the solution.',['y=3x-5','y=x+7']],
+ ['Absolute value equations','Two intersections mean two solutions. Tap both.',['y=|x-3|','y=5']],
+ ['Exponent equations','Solve 2^x = 8 by graphing both sides.',['y=2^x','y=8']],
+ ['Nonlinear systems','A line meeting a parabola? Tap every intersection.',['y=x^2-4','y=2x-1']],
+ ['Find an unknown constant','Use a slider for k and drag until a condition holds, like passing through a point.',['k=1','y=kx+3','(2,7)']],
+ ['No solution vs infinite','Parallel lines never cross. Identical lines overlap everywhere.',['y=2x+1','y=2x-3']],
+ ['Fit a line instantly','A table plus y_1~mx_1+b beats slope-intercept by hand.',[tbl,'y_1\\sim mx_1+b']],
+ ['Percent and growth','Desmos is a full calculator. Type 250·1.04³ directly.',['250\\cdot 1.04^3']],
+ ['Test a point in a region','Graph the inequality, then type the point. If it sits in the shading, it works.',['y>x+1','(1,5)']],
+ ['Restrict a domain','Add {0<x<5} to limit a graph, handy for story problems.',['y=x^2\\left\\{0<x<5\\right\\}']],
+ ['Missing intersections?','Zoom out with the minus button or pinch. Dots appear when you tap a curve.',null]]],
+['Common traps',[['x or y?','Many students solve correctly and answer the wrong variable.'],['Units','Convert hours to minutes or feet to inches before comparing.'],['Sign errors','Wrap negatives in parentheses when typing: (−3)² is not −3².'],['Do not overgraph','If you can see the answer mentally, skip Desmos. It saves time.'],['Check reasonableness','A negative length or a probability above 1 means something went wrong.'],['Squaring both sides','This can create extra solutions. Plug answers back into the original.']]]];
+$('#p-mast').innerHTML='<h2>Mastery</h2><p class="sub">Strategy and speed. Tap Try to load a Desmos example.</p>'+MAST.map(([g,l])=>`<div class="grp">${g}</div>`+l.map(([t,d,set])=>{let b='';if(set){TRY.push(set);b=`<button class="btn g" data-t="${TRY.length-1}">Try</button>`}return `<div class="sc"><div><b>${t}</b><div class="d">${d}</div></div>${b}</div>`}).join('')).join('');
+$$('#p-mast [data-t]').forEach(b=>b.onclick=()=>{mode(false);load(TRY[+b.dataset.t])});
+upd();start();dark(S.dark!==false);
+if(!HAS){document.getElementById('app').insertAdjacentHTML('beforebegin','<div id="warn">The Desmos graphing library could not load (check your connection or ad blocker). You are using the official SAT calculator instead; lessons and practice need the library.</div>');mode(true)}
+</script>
+</body>
+</html>
