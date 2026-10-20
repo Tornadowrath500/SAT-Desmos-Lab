@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SAT Desmos Lab</title>
+<style>
+:root{--bg:#0e1116;--panel:#161a22;--row:#1f2531;--line:#272e3b;--ink:#e8ebf1;--mute:#8b93a6;--dim:#5d6578;--accent:#5b9cf6;--ok:#4cc38a;--bad:#ff7a70;--gbg:#12161d;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+code{font:13px ui-monospace,Menlo,Consolas,monospace;background:var(--row);padding:1px 6px;border-radius:5px}
+.top{position:sticky;top:0;z-index:20;height:57px;background:rgba(14,17,22,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{max-width:1160px;margin:0 auto;height:100%;display:flex;align-items:center;gap:24px;padding:0 24px}
+.brand{font-weight:650;font-size:15px}
+.brand i{font-style:normal;color:var(--accent)}
+.nav{margin-left:auto;display:flex;gap:2px}
+.nav button,.seg button{background:none;border:0;color:var(--mute);font:inherit;font-size:14px;padding:8px 12px;border-radius:8px;cursor:pointer}
+.nav button:hover,.seg button:hover{color:var(--ink)}
+.nav button[aria-selected=true],.seg button[aria-pressed=true]{color:var(--ink);background:var(--row)}
+main{max-width:1160px;margin:0 auto;padding:40px 24px 90px}
+main.full{max-width:none;padding:0}
+.view{display:none}
+.view.on{display:block}
+#t-calc.on{display:flex;flex-direction:column;height:calc(100vh - 57px)}
+.calcbar{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.calcbar .seg{margin:0}
+.calcbar .link{margin-left:auto}
+.satwrap{flex:1;min-height:0}
+.satwrap iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+.labwrap{flex:1;min-height:0;display:grid;grid-template-columns:400px minmax(0,1fr)}
+.labwrap[hidden],.satwrap[hidden]{display:none!important}
+.head{margin-bottom:28px}
+.head h1{font-size:26px;margin:0 0 6px;font-weight:650;letter-spacing:-.02em}
+.head p{margin:0;color:var(--mute);max-width:640px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:56px;align-items:start}
+.split.single{grid-template-columns:minmax(0,1fr)}
+.stick{position:sticky;top:80px}
+@media(max-width:860px){
+  .split{grid-template-columns:1fr;gap:28px}
+  .stick{position:static}
+  .labwrap{grid-template-columns:1fr;grid-template-rows:46vh minmax(0,1fr)}
+}
+.label{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin:0 0 12px}
+.section{margin-top:36px}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:32px;gap:2px}
+.btn{background:var(--row);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:#3a4358}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#06101f;font-weight:600}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.link{background:none;border:0;color:var(--accent);cursor:pointer;font:inherit;font-size:14px;padding:6px 0}
+select,input[type=number]{font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);outline:0}
+select:focus,input[type=number]:focus{border-color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.steps{list-style:none;margin:0;padding:0;border-bottom:1px solid var(--line)}
+.step{display:grid;grid-template-columns:24px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--line)}
+.step .n{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);color:var(--dim);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.step.done .n{background:var(--ok);border-color:var(--ok);color:#06150e}
+.step.done .t{color:var(--mute)}
+.step .t{font-weight:550}
+.step .d{color:var(--mute);font-size:14px;margin-top:2px}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.prompt{font-size:17px;line-height:1.5;margin:0 0 20px;letter-spacing:-.005em}
+.answer{display:flex;gap:8px}
+.answer input{flex:1;min-width:0}
+.fb{font-size:14px;margin-top:12px;min-height:1.3em}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--bad)}
+.hint{font-size:14px;color:var(--mute);margin-top:12px;padding-left:12px;border-left:2px solid var(--line)}
+.guide{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--line);counter-reset:g}
+.guide li{counter-increment:g;padding:12px 0 12px 36px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink);position:relative}
+.guide li::before{content:counter(g);position:absolute;left:0;top:12px;width:22px;height:22px;border-radius:50%;background:var(--row);font-size:11px;display:flex;align-items:center;justify-content:center}
+.score{font-size:13px;color:var(--dim)}
+.trick{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:18px 0;border-top:1px solid var(--line)}
+.trick:last-child{border-bottom:1px solid var(--line)}
+.trick .t{font-weight:550}
+.trick .d{color:var(--mute);font-size:14px;margin-top:2px}
+.trick .grp{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);margin:28px 0 4px}
+.trick .grp:first-child{margin-top:0}
+.sl{padding:14px 0;border-top:1px solid var(--line)}
+.sl:last-child{border-bottom:1px solid var(--line)}
+.sl label{display:flex;justify-content:space-between;font-size:14px;color:var(--mute);margin-bottom:6px}
+.sl label b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.goal{margin-top:24px;font-size:14px;color:var(--mute)}
+.goal.ok{color:var(--ok)}
+.readout{margin-top:16px;font-size:15px;color:var(--mute);line-height:1.7}
+.readout b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+/* graph */
+.gbox{position:relative;height:440px;background:var(--gbg);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.gbox.short{height:340px}
+.gbox canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+.zoom{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;background:var(--row);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.zoom button{width:36px;height:36px;background:none;border:0;color:var(--ink);font-size:17px;cursor:pointer;padding:0}
+.zoom button:hover{background:var(--line)}
+.zoom button+button{border-top:1px solid var(--line)}
+.pred{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--mute);margin-top:14px}
+.pred input{flex:1}
+.pred b{color:var(--ink);font-weight:600;min-width:40px;text-align:right}
+/* Desmos-style expressions */
+.dhead{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 10px;gap:8px}
+.dhead span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.dhead .link{padding:4px 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+.chip{background:var(--row);border:1px solid var(--line);color:var(--mute);border-radius:999px;padding:4px 10px;font:12.5px ui-monospace,Menlo,Consolas,monospace;cursor:pointer}
+.chip:hover{color:var(--ink);border-color:#3a4358}
+.xrow{display:flex;align-items:flex-start;gap:10px;padding:2px 10px 2px 8px;margin:0 8px 2px;border-radius:10px;position:relative}
+.xrow:focus-within{background:var(--row)}
+.xdot{width:16px;height:16px;border-radius:50%;margin-top:14px;flex-shrink:0;border:2px solid;cursor:pointer;padding:0;background:none}
+.xbox{flex:1;min-width:0;padding:8px 2px 6px}
+.xbox input[type=text]{width:100%;background:transparent;border:0;outline:0;color:var(--ink);font:17px/1.4 -apple-system,Helvetica,Arial,sans-serif;padding:0}
+.xbox input[type=text]::placeholder{color:var(--dim)}
+.xinfo,.xerr{font-size:12.5px;color:var(--mute);margin-top:2px}
+.xinfo:empty,.xerr:empty{display:none}
+.xerr{color:var(--bad)}
+.xdel{width:24px;height:24px;border:0;background:none;color:var(--dim);font-size:16px;cursor:pointer;border-radius:6px;flex-shrink:0;margin-top:8px;padding:0;opacity:0}
+.xrow:hover .xdel,.xrow:focus-within .xdel{opacity:1}
+.xdel:hover{background:var(--line);color:var(--ink)}
+.prow{display:flex;align-items:center;gap:10px;padding:6px 18px;font-size:15px}
+.prow .pn{width:22px;font-style:italic;color:var(--ink)}
+.prow input{flex:1;min-width:0}
+.prow .pv2{min-width:44px;text-align:right;color:var(--mute);font-variant-numeric:tabular-nums;font-size:13px}
+.tbl{display:grid;grid-template-columns:1fr 1fr 24px;gap:4px 8px;align-items:center;padding:6px 0 4px}
+.tbl .th{font-size:12px;color:var(--mute);font-weight:600;padding:0 2px}
+.tbl input{width:100%;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:15px -apple-system,Helvetica,Arial,sans-serif;padding:5px 2px;outline:0}
+.tbl input:focus{border-bottom-color:var(--accent)}
+.tbl .addpt{grid-column:1/-1;justify-self:start;padding:4px 0}
+.addrow{display:flex;gap:18px;padding:8px 18px 4px}
+.dpanel{background:var(--panel);border-right:1px solid var(--line);overflow:auto;padding:14px 0 60px}
+#t-calc .gbox{height:100%;border:0;border-radius:0}
+#cGraph{height:100%}
+</style>
+</head>
+<body>
+<div id="err" style="display:none;background:#3a1d1d;color:#ffb4ab;padding:10px 16px;font-size:14px"></div>
+<header class="top">
+  <div class="bar">
+    <div class="brand">SAT <i>Desmos</i> Lab</div>
+    <nav class="nav">
+      <button data-tab="learn" aria-selected="true">Learn</button>
+      <button data-tab="practice" aria-selected="false">Practice</button>
+      <button data-tab="calc" aria-selected="false">Calculator</button>
+      <button data-tab="tricks" aria-selected="false">Tricks</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- LEARN -->
+  <section class="view on" id="t-learn">
+    <div class="head"><h1>Learn</h1><p>Five lessons covering the main Desmos-friendly topics on the SAT. Each graph stays in view while you work.</p></div>
+    <div class="seg" id="lessonSeg">
+      <button data-les="reg" aria-pressed="true">Regression</button>
+      <button data-les="sys" aria-pressed="false">Systems</button>
+      <button data-les="quad" aria-pressed="false">Quadratics</button>
+      <button data-les="ineq" aria-pressed="false">Inequalities</button>
+      <button data-les="circ" aria-pressed="false">Circles</button>
+    </div>
+
+    <div id="l-reg" class="split">
+      <div>
+        <div class="label">Steps</div>
+        <ol class="steps" id="regSteps"></ol>
+        <div class="section"><div class="label">Expressions</div><div id="rList"></div></div>
+      </div>
+      <div class="stick"><div class="label">Graph</div><div id="rGraph"></div></div>
+    </div>
+
+    <div id="l-sys" class="split" hidden>
+      <div>
+        <div class="label">Sliders</div>
+        <p class="readout" style="margin:0 0 16px">Two lines cross at one point. Desmos marks that intersection, which is the solution to the system.</p>
+        <div id="sysSliders"></div>
+        <div class="goal" id="sysGoal"></div>
+      </div>
+      <div class="stick"><div class="label">Graph</div><div id="sysGraph"></div><div class="readout" id="sysOut"></div></div>
+    </div>
+
+    <div id="l-quad" class="split" hidden>
+      <div>
+        <div class="label">Sliders</div>
+        <p class="readout" style="margin:0 0 16px">The x-intercepts are the roots. The vertex sits halfway between them, at x = (r₁ + r₂) / 2. Sum of roots = −b/a and product of roots = c/a.</p>
+        <div id="quadSliders"></div>
+        <div class="goal" id="quadGoal"></div>
+      </div>
+      <div class="stick"><div class="label">Graph</div><div id="quadGraph"></div><div class="readout" id="quadOut"></div></div>
+    </div>
+
+    <div id="l-ineq" class="split" hidden>
+      <div>
+        <div class="label">Sliders</div>
+        <p class="readout" style="margin:0 0 16px">The shaded region is every point that satisfies the inequality. Test a point to check: if it lands in the shading, it is a solution.</p>
+        <div id="ineqSliders"></div>
+        <div class="goal" id="ineqGoal"></div>
+      </div>
+      <div class="stick"><div class="label">Graph</div><div id="ineqGraph"></div><div class="readout" id="ineqOut"></div></div>
+    </div>
+
+    <div id="l-circ" class="split" hidden>
+      <div>
+        <div class="label">Sliders</div>
+        <p class="readout" style="margin:0 0 16px">For a circle with center (h, k) and radius r, the standard form is (x − h)² + (y − k)² = r². The radius is the square root of the constant on the right.</p>
+        <div id="circSliders"></div>
+        <div class="goal" id="circGoal"></div>
+      </div>
+      <div class="stick"><div class="label">Graph</div><div id="circGraph"></div><div class="readout" id="circOut"></div></div>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section class="view" id="t-practice">
+    <div class="head"><h1>Practice</h1><p>Generated problems across Algebra, Advanced Math, Problem Solving and Data Analysis, and Geometry and Trigonometry. Each has a guided solution.</p></div>
+    <div id="pSplit" class="split">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px">
+          <select id="prSel" aria-label="Topic"></select>
+          <span class="score" id="prScore"></span>
+        </div>
+        <div id="prCard"></div>
+        <div class="section" id="pListWrap"><div class="label">Expressions</div><div id="pList"></div></div>
+      </div>
+      <div class="stick" id="pGraphWrap"><div class="label">Graph</div><div id="pGraph"></div></div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section class="view" id="t-calc">
+    <div class="calcbar">
+      <div class="seg" id="calcSeg">
+        <button data-mode="sat" aria-pressed="true">SAT calculator</button>
+        <button data-mode="lab" aria-pressed="false">Lab calculator</button>
+      </div>
+      <a class="link" href="https://www.desmos.com/testing/collegeboard/graphing" target="_blank" rel="noopener">Open in new tab ↗</a>
+    </div>
+    <div class="satwrap" id="m-sat"><iframe src="https://www.desmos.com/testing/collegeboard/graphing" title="Official SAT Desmos calculator" allow="clipboard-write"></iframe></div>
+    <div class="labwrap" id="m-lab" hidden>
+    <div class="dpanel">
+      <div class="dhead"><span>Expressions</span></div>
+      <div class="chips" id="chips"></div>
+      <div id="cList"></div>
+    </div>
+    <div id="cGraph"></div>
+    </div>
+  </section>
+
+  <!-- TRICKS -->
+  <section class="view" id="t-tricks">
+    <div class="head"><h1>Tricks</h1><p>Desmos moves that save time on the SAT. Press Try to load the example into the calculator.</p></div>
+    <div id="tricksList"></div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js"></script>
+<script>
+const showErr = m => { const b = document.getElementById('err'); b.style.display = 'block'; b.textContent = m; };
+window.addEventListener('error', e => showErr('Something failed: ' + e.message));
+const COLORS = ['#ff6b63', '#4f9cf7', '#4cc38a', '#a78bfa', '#ffa04d'];
+const GC = { bg: '#12161d', grid: '#1d2330', axis: '#596276', lab: '#7f8799', stroke: '#12161d' };
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const norm = s => s.toLowerCase().replace(/[\s*()]/g, '');
+const fmt = v => (Number.isInteger(+(+v).toFixed(6)) ? String(+(+v).toFixed(6)) : (+(+v).toFixed(4)).toString());
+const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const sgn = b => (b >= 0 ? `+ ${b}` : `− ${-b}`);
+const eqT = (m, b) => `y = ${m}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)}`;
+const pick = a => a[ri(0, a.length - 1)];
+const GRAPHS = [];
+let UID = 0;
+function mk(kind, text = '', pts = null) {
+  UID++;
+  return { id: UID, kind, text, color: COLORS[0], on: true, pts: kind === 'table' ? (pts || [['', '']]) : null,
+    curve: null, shade: null, vert: null, paths: [], points: [], info: '', err: '' };
+}
+
+/* ---------- Math helpers ---------- */
+// Desmos treats runs of letters as products (ax means a*x) but keeps function names intact.
+const FNS = /\b(sqrt|abs|sin|cos|tan|log|exp|cbrt|nthroot|floor|ceil|round|asin|acos|atan|min|max|pi)\b/g;
+function prep(s) {
+  const keep = [];
+  let t = s.replace(FNS, m => { keep.push(m); return '\u0001' + (keep.length - 1) + '\u0002'; });
+  t = t.replace(/[a-zA-Z]{2,}/g, m => m.split('').join('*'));
+  return t.replace(/\u0001(\d+)\u0002/g, (_, i) => keep[+i]);
+}
+function symbolsOf(src) {
+  try {
+    const names = new Set();
+    math.parse(src).traverse(n => { if (n.isSymbolNode && n.name !== 'x' && math[n.name] === undefined) names.add(n.name); });
+    return [...names];
+  } catch (_) { return null; }
+}
+function solve3(A, b) {
+  const M = A.map((r, i) => [...r, b[i]]);
+  for (let c = 0; c < 3; c++) {
+    let p = c;
+    for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    if (Math.abs(M[c][c]) < 1e-12) return null;
+    for (let r = 0; r < 3; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k < 4; k++) M[r][k] -= f * M[c][k]; }
+  }
+  return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+}
+function fit(model, pts) {
+  const n = pts.length;
+  if (model === 'lin') {
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    pts.forEach(([x, y]) => { sx += x; sy += y; sxx += x * x; sxy += x * y; });
+    const d = n * sxx - sx * sx; if (!d) return null;
+    const a = (n * sxy - sx * sy) / d, b = (sy - a * sx) / n;
+    return { f: x => a * x + b, text: `y = ${fmt(a)}x + ${fmt(b)}` };
+  }
+  if (model === 'quad') {
+    const s = [0, 0, 0, 0, 0, 0, 0];
+    pts.forEach(([x, y]) => { s[0] += x; s[1] += x ** 2; s[2] += x ** 3; s[3] += x ** 4; s[4] += y; s[5] += x * y; s[6] += x * x * y; });
+    const sol = solve3([[s[3], s[2], s[1]], [s[2], s[1], s[0]], [s[1], s[0], n]], [s[6], s[5], s[4]]);
+    if (!sol) return null;
+    const [a, b, c] = sol;
+    return { f: x => a * x * x + b * x + c, text: `y = ${fmt(a)}x² + ${fmt(b)}x + ${fmt(c)}` };
+  }
+  if (model === 'exp') {
+    if (pts.some(([, y]) => y <= 0)) return { error: 'Exponential fits need every y-value to be positive.' };
+    let sx = 0, sl = 0, sxx = 0, sxl = 0;
+    pts.forEach(([x, y]) => { const l = Math.log(y); sx += x; sl += l; sxx += x * x; sxl += x * l; });
+    const d = n * sxx - sx * sx; if (!d) return null;
+    const slope = (n * sxl - sx * sl) / d, icp = (sl - slope * sx) / n;
+    const A = Math.exp(icp), B = Math.exp(slope);
+    return { f: x => A * Math.pow(B, x), text: `y = ${fmt(A)} · ${fmt(B)}^x` };
+  }
+  return null;
+}
+function r2(pts, f) {
+  const ybar = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+  let tot = 0, res = 0;
+  pts.forEach(([x, y]) => { tot += (y - ybar) ** 2; res += (y - f(x)) ** 2; });
+  return tot ? 1 - res / tot : 1;
+}
+function validPts(ex) {
+  const t = ex.find(e => e.kind === 'table');
+  if (!t) return [];
+  return t.pts.map(([a, b]) => [parseFloat(a), parseFloat(b)]).filter(p => isFinite(p[0]) && isFinite(p[1]));
+}
+const hasT = (ex, list) => ex.some(e => e.kind === 'expr' && list.includes(norm(e.text)));
+
+function evalOne(e, tp, P) {
+  e.curve = null; e.shade = null; e.vert = null; e.paths = []; e.points = []; e.info = ''; e.err = '';
+  if (e.kind === 'table') { e.info = tp.length ? `${tp.length} point${tp.length > 1 ? 's' : ''} · drag on the graph to adjust` : 'Enter x1 and y1 values'; return; }
+  const t = e.text.trim();
+  if (!t) return;
+  try {
+    if (t.includes('~')) {
+      const [lhs, rhs] = t.split('~');
+      if (!/^\s*y1\s*$/.test(lhs)) throw 'A regression must start with y1 ~';
+      if (tp.length < 2) throw 'Add a table with at least two points first.';
+      const model = /x1\^2/.test(rhs) ? 'quad' : /\^\s*\(?\s*x1\s*\)?/.test(rhs) ? 'exp' : 'lin';
+      const r = fit(model, tp);
+      if (!r) throw 'Could not fit these points. Check that the x-values vary.';
+      if (r.error) throw r.error;
+      e.curve = r.f;
+      e.info = `${r.text}   ·   R² ${r2(tp, r.f).toFixed(4)}`;
+      return;
+    }
+    if (typeof math === 'undefined') throw 'The math engine did not load. Check your connection.';
+    let m;
+    if ((m = t.match(/^y\s*(>=|<=|≥|≤|>|<|=)\s*(.+)$/))) {
+      const code = math.compile(prep(m[2]));
+      const f = x => { const v = code.evaluate(Object.assign({}, P, { x })); return typeof v === 'number' ? v : NaN; };
+      f(0);
+      e.curve = f;
+      if (m[1] !== '=') { e.shade = /[>≥]/.test(m[1]) ? 'above' : 'below'; e.info = `shaded ${e.shade} the line`; }
+      else e.info = 'graph of y = f(x)';
+    } else if ((m = t.match(/^x\s*=\s*(.+)$/))) {
+      e.vert = math.evaluate(prep(m[1]), Object.assign({}, P));
+      e.info = 'vertical line';
+    } else if ((m = t.match(/^circle\((.+)\)$/i))) {
+      const [h, k, r] = m[1].split(',').map(s => math.evaluate(prep(s), Object.assign({}, P)));
+      const pts = [];
+      for (let i = 0; i <= 180; i++) { const a = i / 180 * 2 * Math.PI; pts.push([h + r * Math.cos(a), k + r * Math.sin(a)]); }
+      e.paths = [pts];
+      e.info = `circle, center (${fmt(h)}, ${fmt(k)}), radius ${fmt(r)}`;
+    } else if (/^\(.*,.*\)$/.test(t)) {
+      const [a, b] = t.slice(1, -1).split(',');
+      e.points = [[math.evaluate(prep(a), Object.assign({}, P)), math.evaluate(prep(b), Object.assign({}, P))]];
+    } else {
+      throw 'Try y = …, y > …, x = …, (a, b), circle(h, k, r), a table, or y1 ~ ax1 + b';
+    }
+  } catch (err) {
+    e.err = typeof err === 'string' ? err : (err.message || 'Cannot evaluate this');
+    e.curve = null; e.shade = null; e.vert = null; e.paths = []; e.points = [];
+  }
+}
+
+/* ---------- Graph ---------- */
+class Graph {
+  constructor(canvas) {
+    this.c = canvas; this.v = { cx: 0, cy: 0, ppu: 50 }; this.scene = { curves: [], verts: [], paths: [], points: [] }; this.drag = null;
+    canvas.addEventListener('pointerdown', e => this.down(e));
+    canvas.addEventListener('pointermove', e => this.move(e));
+    canvas.addEventListener('pointerup', () => { this.drag = null; });
+    canvas.addEventListener('wheel', e => { e.preventDefault(); const [px, py] = this.px(e); this.zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, px, py); }, { passive: false });
+    new ResizeObserver(() => this.draw()).observe(canvas);
+  }
+  set(scene) { this.scene = { curves: scene.curves || [], verts: scene.verts || [], paths: scene.paths || [], points: scene.points || [] }; this.draw(); }
+  px(e) { const r = this.c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  toW(px, py) { const w = this.c.clientWidth, h = this.c.clientHeight; return [this.v.cx + (px - w / 2) / this.v.ppu, this.v.cy - (py - h / 2) / this.v.ppu]; }
+  toP(x, y) { const w = this.c.clientWidth, h = this.c.clientHeight; return [w / 2 + (x - this.v.cx) * this.v.ppu, h / 2 - (y - this.v.cy) * this.v.ppu]; }
+  hit(px, py) {
+    for (const p of this.scene.points) {
+      if (!p.onDrag) continue;
+      const [X, Y] = this.toP(p.x, p.y);
+      if (Math.hypot(X - px, Y - py) < 12) return p;
+    }
+    return null;
+  }
+  down(e) {
+    const [px, py] = this.px(e);
+    const h = this.hit(px, py);
+    this.c.setPointerCapture(e.pointerId);
+    this.drag = h ? { pt: h } : { x: e.clientX, y: e.clientY, cx: this.v.cx, cy: this.v.cy };
+    this.c.style.cursor = h ? 'pointer' : 'grabbing';
+  }
+  move(e) {
+    const [px, py] = this.px(e);
+    if (!this.drag) { this.c.style.cursor = this.hit(px, py) ? 'pointer' : 'grab'; return; }
+    if (this.drag.pt) {
+      let [x, y] = this.toW(px, py);
+      x = Math.round(x * 2) / 2; y = Math.round(y * 2) / 2;
+      this.drag.pt.onDrag(x, y);
+    } else {
+      this.v.cx = this.drag.cx - (e.clientX - this.drag.x) / this.v.ppu;
+      this.v.cy = this.drag.cy + (e.clientY - this.drag.y) / this.v.ppu;
+      this.draw();
+    }
+  }
+  zoomAt(f, px, py) {
+    const [wx, wy] = this.toW(px, py);
+    const w = this.c.clientWidth, h = this.c.clientHeight;
+    this.v.ppu = Math.min(4000, Math.max(4, this.v.ppu * f));
+    this.v.cx = wx - (px - w / 2) / this.v.ppu;
+    this.v.cy = wy + (py - h / 2) / this.v.ppu;
+    this.draw();
+  }
+  reset() { this.v = { cx: 0, cy: 0, ppu: 50 }; this.draw(); }
+  draw() {
+    const c = this.c, dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+    if (!w || !h) return;
+    if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+    const g = c.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = GC.bg; g.fillRect(0, 0, w, h);
+    const { cx, cy, ppu } = this.v;
+    const X = v => w / 2 + (v - cx) * ppu, Y = v => h / 2 - (v - cy) * ppu;
+    const raw = 90 / ppu, base = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = base * [1, 2, 5, 10].find(m => m * base >= raw);
+    const dec = Math.max(0, -Math.floor(Math.log10(step)));
+    const x0 = cx - w / 2 / ppu, x1 = cx + w / 2 / ppu, y0 = cy - h / 2 / ppu, y1 = cy + h / 2 / ppu;
+    const seg = (ax, ay, bx, by, col, lw) => { g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); };
+    for (let v = Math.ceil(x0 / step) * step; v <= x1; v += step) { const ax = Math.abs(v) < step / 1e6; seg(X(v) + .5, 0, X(v) + .5, h, ax ? GC.axis : GC.grid, ax ? 1.5 : 1); }
+    for (let v = Math.ceil(y0 / step) * step; v <= y1; v += step) { const ax = Math.abs(v) < step / 1e6; seg(0, Y(v) + .5, w, Y(v) + .5, ax ? GC.axis : GC.grid, ax ? 1.5 : 1); }
+    g.font = '12px -apple-system,Helvetica,Arial,sans-serif'; g.fillStyle = GC.lab;
+    for (let v = Math.ceil(x0 / step) * step; v <= x1; v += step) { if (Math.abs(v) < step / 1e6) continue; g.fillText(v.toFixed(dec), X(v) - 6, Math.min(h - 6, Math.max(14, Y(0) + 16))); }
+    for (let v = Math.ceil(y0 / step) * step; v <= y1; v += step) { if (Math.abs(v) < step / 1e6) continue; g.fillText(v.toFixed(dec), Math.min(w - 32, Math.max(4, X(0) + 6)), Y(v) + 4); }
+    for (const cv of this.scene.curves) {
+      if (cv.shade) {
+        const edge = cv.shade === 'above' ? 0 : h;
+        g.globalAlpha = .16; g.fillStyle = cv.color; g.beginPath(); g.moveTo(0, edge);
+        for (let px = 0; px <= w; px++) {
+          const xv = cx + (px - w / 2) / ppu; let yv; try { yv = cv.f(xv); } catch (_) { yv = NaN; }
+          if (isFinite(yv)) g.lineTo(px, Y(yv));
+        }
+        g.lineTo(w, edge); g.closePath(); g.fill(); g.globalAlpha = 1;
+      }
+      g.strokeStyle = cv.color; g.lineWidth = 2.5; g.beginPath();
+      let pen = false, prev = null;
+      for (let px = 0; px <= w; px++) {
+        const xv = cx + (px - w / 2) / ppu;
+        let yv; try { yv = cv.f(xv); } catch (_) { yv = NaN; }
+        if (!isFinite(yv) || Math.abs(yv) > 1e6) { pen = false; prev = null; continue; }
+        const py = Y(yv);
+        if (!pen || prev === null || Math.abs(py - prev) > h * 2) g.moveTo(px, py); else g.lineTo(px, py);
+        pen = true; prev = py;
+      }
+      g.stroke();
+    }
+    for (const v of this.scene.verts) { const xp = X(v.x); if (xp < -2 || xp > w + 2) continue; g.strokeStyle = v.color; g.lineWidth = 2.5; g.beginPath(); g.moveTo(xp, 0); g.lineTo(xp, h); g.stroke(); }
+    for (const p of this.scene.paths) {
+      g.strokeStyle = p.color; g.lineWidth = 2.5; g.beginPath();
+      p.pts.forEach(([x, y], i) => { if (i) g.lineTo(X(x), Y(y)); else g.moveTo(X(x), Y(y)); });
+      g.stroke();
+    }
+    for (const p of this.scene.points) {
+      if (!isFinite(p.x) || !isFinite(p.y)) continue;
+      const px = X(p.x), py = Y(p.y);
+      g.beginPath(); g.arc(px, py, p.ring ? 6.5 : 6, 0, Math.PI * 2);
+      if (p.ring) { g.fillStyle = GC.bg; g.fill(); g.strokeStyle = p.color; g.lineWidth = 2.5; g.stroke(); }
+      else { g.fillStyle = p.color; g.fill(); g.strokeStyle = GC.stroke; g.lineWidth = 1.5; g.stroke(); }
+    }
+  }
+}
+function graphShell(el, extra = '') {
+  el.innerHTML = `<div class="gbox"><canvas></canvas><div class="zoom">
+    <button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="home" aria-label="Reset view">⌂</button>
+  </div></div>${extra}`;
+  const graph = new Graph($('canvas', el));
+  el.querySelectorAll('[data-z]').forEach(b => b.onclick = () => {
+    const w = graph.c.clientWidth / 2, h = graph.c.clientHeight / 2;
+    if (b.dataset.z === 'in') graph.zoomAt(1.5, w, h);
+    else if (b.dataset.z === 'out') graph.zoomAt(1 / 1.5, w, h);
+    else graph.reset();
+  });
+  GRAPHS.push(graph);
+  return graph;
+}
+
+/* ---------- Workspace: Desmos-style expressions + graph ---------- */
+function Workspace(listEl, graphEl, opts = {}) {
+  const graph = graphShell(graphEl, opts.predict ? `<div class="pred" style="padding:0 16px"><span>Predict y at x</span><input type="range" min="0" max="12" step="0.5" value="6"><b class="pv">—</b></div>` : '');
+  listEl.innerHTML = `<div class="params"></div><div class="rows"></div><div class="addrow"><button class="link" data-add="expr">+ Expression</button><button class="link" data-add="table">+ Table</button></div>`;
+  const rows = $('.rows', listEl), params = $('.params', listEl);
+  const ws = { exprs: (opts.init || []).slice(), listeners: [], predictX: 6, graph, params: {} };
+
+  ws.renderParams = () => {
+    params.innerHTML = '';
+    Object.keys(ws.params).forEach(n => {
+      const d = document.createElement('div'); d.className = 'prow';
+      d.innerHTML = `<span class="pn">${n}</span><input type="range" min="-10" max="10" step="0.1" value="${ws.params[n]}"><span class="pv2">${fmt(ws.params[n])}</span>`;
+      const inp = $('input', d), out = $('.pv2', d);
+      inp.oninput = () => { ws.params[n] = parseFloat(inp.value); out.textContent = fmt(ws.params[n]); ws.update(); };
+      params.appendChild(d);
+    });
+  };
+  ws.render = () => {
+    ws.exprs.forEach((e, i) => e.color = COLORS[i % COLORS.length]);
+    rows.innerHTML = '';
+    ws.exprs.forEach(e => rows.appendChild(row(e)));
+    ws.update();
+  };
+  function row(e) {
+    const r = document.createElement('div'); r.className = 'xrow';
+    const dot = document.createElement('button'); dot.className = 'xdot'; dot.style.borderColor = e.color; dot.style.background = e.on ? e.color : 'transparent'; dot.setAttribute('aria-label', 'Toggle visibility');
+    dot.onclick = () => { e.on = !e.on; ws.render(); };
+    const box = document.createElement('div'); box.className = 'xbox';
+    if (e.kind === 'table') {
+      const g = document.createElement('div'); g.className = 'tbl';
+      g.innerHTML = '<span class="th">x1</span><span class="th">y1</span><span></span>';
+      e.pts.forEach((p, i) => {
+        [0, 1].forEach(j => {
+          const inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.value = p[j];
+          inp.dataset.r = i; inp.dataset.c = j;
+          inp.oninput = () => { p[j] = inp.value; ws.update(); };
+          g.appendChild(inp);
+        });
+        const x = document.createElement('button'); x.className = 'xdel'; x.style.opacity = 1; x.textContent = '×'; x.setAttribute('aria-label', 'Remove point');
+        x.onclick = () => { e.pts.splice(i, 1); if (!e.pts.length) e.pts.push(['', '']); ws.render(); };
+        g.appendChild(x);
+      });
+      const ap = document.createElement('button'); ap.className = 'link addpt'; ap.textContent = '+ add point';
+      ap.onclick = () => { e.pts.push(['', '']); ws.render(); const ins = $$('.tbl input', rows); if (ins.length >= 2) ins[ins.length - 2].focus(); };
+      g.appendChild(ap);
+      box.appendChild(g);
+    } else {
+      const inp = document.createElement('input'); inp.type = 'text'; inp.value = e.text; inp.placeholder = 'y = 2x + 1'; inp.spellcheck = false; inp.setAttribute('aria-label', 'Expression');
+      inp.oninput = () => {
+        e.text = inp.value;
+        if (e.text.trim().toLowerCase() === 'table') { e.kind = 'table'; e.text = ''; e.pts = [['', '']]; ws.render(); const t = $('.tbl input', rows); if (t) t.focus(); return; }
+        ws.update();
+      };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') ws.add('expr'); };
+      box.appendChild(inp);
+    }
+    const info = document.createElement('div'); info.className = 'xinfo'; info.dataset.info = e.id;
+    const err = document.createElement('div'); err.className = 'xerr'; err.dataset.err = e.id;
+    box.append(info, err);
+    const del = document.createElement('button'); del.className = 'xdel'; del.textContent = '×'; del.setAttribute('aria-label', 'Delete expression');
+    del.onclick = () => { ws.exprs = ws.exprs.filter(x => x !== e); ws.render(); };
+    r.append(dot, box, del);
+    return r;
+  }
+  ws.update = () => {
+    // free variables become sliders, as in Desmos
+    const need = new Set();
+    ws.exprs.forEach(e => {
+      if (e.kind !== 'expr') return;
+      const m = e.text.match(/^\s*(?:y\s*(?:>=|<=|≥|≤|>|<|=)|x\s*=)\s*(.+)$/);
+      if (!m) return;
+      const names = symbolsOf(prep(m[1]));
+      if (names) names.forEach(n => need.add(n));
+    });
+    let changed = false;
+    need.forEach(n => { if (!(n in ws.params)) { ws.params[n] = 1; changed = true; } });
+    Object.keys(ws.params).forEach(n => { if (!need.has(n)) { delete ws.params[n]; changed = true; } });
+    if (changed) ws.renderParams();
+
+    const tbl = ws.exprs.find(e => e.kind === 'table');
+    const tp = [], tref = [];
+    if (tbl) tbl.pts.forEach((p, i) => { const x = parseFloat(p[0]), y = parseFloat(p[1]); if (isFinite(x) && isFinite(y)) { tp.push([x, y]); tref.push(i); } });
+    ws.exprs.forEach(e => evalOne(e, tp, ws.params));
+
+    const curves = [], verts = [], paths = [], points = [];
+    ws.exprs.forEach(e => {
+      if (!e.on) return;
+      if (e.curve) curves.push({ f: e.curve, color: e.color, shade: e.shade });
+      if (e.vert !== null && isFinite(e.vert)) verts.push({ x: e.vert, color: e.color });
+      e.paths.forEach(p => paths.push({ pts: p, color: e.color }));
+      if (e.kind === 'table') {
+        tref.forEach((idx, k) => points.push({ x: tp[k][0], y: tp[k][1], color: e.color, onDrag: (x, y) => {
+          e.pts[idx] = [String(x), String(y)];
+          const a = $(`.tbl input[data-r="${idx}"][data-c="0"]`, rows), b = $(`.tbl input[data-r="${idx}"][data-c="1"]`, rows);
+          if (a) a.value = x;
+          if (b) b.value = y;
+          ws.update();
+        } }));
+      }
+      e.points.forEach(p => points.push({ x: p[0], y: p[1], color: e.color }));
+    });
+    if (opts.predict) {
+      const reg = ws.exprs.find(e => e.on && e.kind === 'expr' && e.curve && !e.shade);
+      const pv = $('.pv', graphEl);
+      if (reg) {
+        const y = reg.curve(ws.predictX);
+        if (isFinite(y)) { points.push({ x: ws.predictX, y, color: reg.color, ring: true }); if (pv) pv.textContent = fmt(y); }
+        else if (pv) pv.textContent = '—';
+      }
+    }
+    graph.set({ curves, verts, paths, points });
+    ws.exprs.forEach(e => {
+      const i = $(`[data-info="${e.id}"]`, listEl); if (i) i.textContent = e.info;
+      const r = $(`[data-err="${e.id}"]`, listEl); if (r) r.textContent = e.err;
+    });
+    ws.listeners.forEach(fn => fn(ws));
+  };
+  ws.add = (kind, text = '') => {
+    ws.exprs.push(mk(kind, text));
+    ws.render();
+    const target = kind === 'table' ? $('.tbl input', rows) : $$('input[type=text]', rows).pop();
+    if (target) target.focus();
+  };
+  ws.load = list => { ws.exprs = list; ws.params = {}; ws.renderParams(); ws.render(); };
+  listEl.querySelectorAll('[data-add]').forEach(b => b.onclick = () => ws.add(b.dataset.add));
+  const pr = $('input[type=range]', graphEl);
+  if (pr) pr.oninput = () => { ws.predictX = parseFloat(pr.value); ws.update(); };
+  ws.render();
+  return ws;
+}
+
+/* ---------- Sliders & lesson helper ---------- */
+function sliders(el, defs, S, onChange) {
+  el.innerHTML = '';
+  defs.forEach(([k, label, min, max, step]) => {
+    const d = document.createElement('div'); d.className = 'sl';
+    d.innerHTML = `<label><span>${label}</span><b></b></label><input type="range" min="${min}" max="${max}" step="${step}" value="${S[k]}">`;
+    const inp = $('input', d), out = $('b', d);
+    out.textContent = S[k];
+    inp.oninput = () => { S[k] = parseFloat(inp.value); out.textContent = S[k]; onChange(); };
+    el.appendChild(d);
+  });
+}
+
+/* ---------- Learn: regression (auto-checked) ---------- */
+const REG_STEPS = [
+  { t: 'Create a table', d: 'Type table in the expression list.', ok: ex => ex.some(e => e.kind === 'table') },
+  { t: 'Add at least two points', d: 'Fill in x1 and y1, or drag points on the graph.', ok: ex => validPts(ex).length >= 2 },
+  { t: 'Fit a line', d: 'Type y1 ~ ax1 + b. The ~ means fit to the data, not solve.', ok: ex => hasT(ex, ['y1~mx1+b', 'y1~ax1+b']) },
+  { t: 'Fit a parabola', d: 'Type y1 ~ ax1^2 + bx1 + c.', ok: ex => hasT(ex, ['y1~ax1^2+bx1+c']) },
+  { t: 'Fit an exponential', d: 'Type y1 ~ ab^x1. Every y-value must be positive.', ok: ex => hasT(ex, ['y1~ab^x1']) }
+];
+function renderRegSteps(ws) {
+  const ol = $('#regSteps'); ol.innerHTML = '';
+  REG_STEPS.forEach((s, i) => {
+    const done = s.ok(ws.exprs);
+    const li = document.createElement('li'); li.className = 'step' + (done ? ' done' : '');
+    li.innerHTML = `<span class="n">${done ? '✓' : i + 1}</span><div><div class="t">${s.t}</div><div class="d">${s.d}</div></div>`;
+    ol.appendChild(li);
+  });
+}
+
+/* ---------- Learn: systems ---------- */
+const SYS = { m1: 1, b1: -2, m2: -1, b2: 4 };
+const sysGraph = graphShell($('#sysGraph'));
+function updateSys() {
+  const { m1, b1, m2, b2 } = SYS;
+  const goal = $('#sysGoal'), out = $('#sysOut');
+  const GOAL = { x: 3, y: 1 };
+  let points = [];
+  goal.className = 'goal';
+  if (m1 === m2) {
+    out.innerHTML = b1 === b2 ? 'The lines are identical, so every point is shared.' : 'The lines are parallel, so they never cross.';
+    goal.textContent = `Goal: make the lines cross at (${GOAL.x}, ${GOAL.y}).`;
+  } else {
+    const x = (b2 - b1) / (m1 - m2), y = m1 * x + b1;
+    points = [{ x, y, color: '#e8ebf1' }];
+    out.innerHTML = `Intersection <b>(${x.toFixed(2)}, ${y.toFixed(2)})</b>`;
+    const hit = Math.abs(x - GOAL.x) < 0.05 && Math.abs(y - GOAL.y) < 0.05;
+    if (hit) goal.classList.add('ok');
+    goal.textContent = hit ? `Goal reached. The lines cross at (${GOAL.x}, ${GOAL.y}).` : `Goal: make the lines cross at (${GOAL.x}, ${GOAL.y}).`;
+  }
+  sysGraph.set({ curves: [{ f: x => m1 * x + b1, color: COLORS[1] }, { f: x => m2 * x + b2, color: COLORS[0] }], points });
+}
+
+/* ---------- Learn: quadratics ---------- */
+const QD = { r1: -2, r2: 3 };
+const quadGraph = graphShell($('#quadGraph'));
+function updateQuad() {
+  const { r1, r2 } = QD, s = r1 + r2, p = r1 * r2, vx = s / 2, vy = (vx - r1) * (vx - r2);
+  quadGraph.set({
+    curves: [{ f: x => (x - r1) * (x - r2), color: COLORS[0] }],
+    points: [{ x: r1, y: 0, color: COLORS[1] }, { x: r2, y: 0, color: COLORS[1] }, { x: vx, y: vy, color: COLORS[2] }]
+  });
+  $('#quadOut').innerHTML = `y = (x ${sgn(-r1)})(x ${sgn(-r2)}) = x² ${sgn(-s)}x ${sgn(p)}<br>Sum of roots <b>${s}</b> · product <b>${p}</b> · vertex x <b>${fmt(vx)}</b>`;
+  const goal = $('#quadGoal');
+  const hit = (r1 === -1 && r2 === 3) || (r1 === 3 && r2 === -1);
+  goal.className = 'goal' + (hit ? ' ok' : '');
+  goal.textContent = hit ? 'Goal reached. The roots are −1 and 3.' : 'Goal: make the roots −1 and 3.';
+}
+
+/* ---------- Learn: inequalities ---------- */
+const INQ = { m: 1, b: -2 };
+const ineqGraph = graphShell($('#ineqGraph'));
+function updateIneq() {
+  const { m, b } = INQ;
+  ineqGraph.set({ curves: [{ f: x => m * x + b, color: COLORS[1], shade: 'above' }], points: [{ x: 0, y: 0, color: '#e8ebf1' }] });
+  $('#ineqOut').innerHTML = `Solution set: <b>y &gt; ${m}x ${b >= 0 ? '+' : '−'} ${Math.abs(b)}</b> (shaded above the line)<br>Test the origin: 0 &gt; ${b} is ${0 > b ? 'true, so it is shaded' : 'false, so it is not shaded'}.`;
+  const goal = $('#ineqGoal'), hit = 0 > b;
+  goal.className = 'goal' + (hit ? ' ok' : '');
+  goal.textContent = hit ? 'Goal reached. The origin is a solution.' : 'Goal: make the origin part of the shaded region.';
+}
+
+/* ---------- Learn: circles ---------- */
+const CIR = { h: 0, k: 0, r: 3 };
+const circGraph = graphShell($('#circGraph'));
+function updateCirc() {
+  const { h, k, r } = CIR;
+  const pts = [];
+  for (let i = 0; i <= 180; i++) { const a = i / 180 * 2 * Math.PI; pts.push([h + r * Math.cos(a), k + r * Math.sin(a)]); }
+  circGraph.set({ paths: [{ pts, color: COLORS[1] }], points: [{ x: h, y: k, color: COLORS[0] }] });
+  $('#circOut').innerHTML = `(x ${sgn(-h)})² + (y ${sgn(-k)})² = <b>${fmt(r * r)}</b><br>Radius r = √${fmt(r * r)} = <b>${fmt(r)}</b>`;
+  const goal = $('#circGoal'), hit = h === 0 && k === 0 && r === 5;
+  goal.className = 'goal' + (hit ? ' ok' : '');
+  goal.textContent = hit ? 'Goal reached. Center (0, 0), radius 5.' : 'Goal: center (0, 0) and radius 5.';
+}
+
+/* ---------- Practice ---------- */
+const GENS = {
+  linear() {
+    const a = ri(2, 6), x0 = ri(-6, 6), b = ri(-9, 9), c = a * x0 + b;
+    return { tag: 'Algebra', prompt: `Solve for x: ${a}x ${sgn(b)} = ${c}`, answer: x0,
+      steps: [`Subtract ${b} from both sides: ${a}x = ${c - b}.`, `Divide both sides by ${a}: x = ${x0}.`, 'In Desmos, graph y = ax + b and y = c. The x-coordinate of the intersection is the solution.'] };
+  },
+  sys() {
+    let m1 = ri(-3, 3), m2 = ri(-3, 3); if (m1 === m2) m2 = m1 + 2;
+    const x0 = ri(-5, 5), y0 = ri(-6, 6), b1 = y0 - m1 * x0, b2 = y0 - m2 * x0;
+    return { tag: 'Algebra', prompt: `The lines y = ${m1}x ${sgn(b1)} and y = ${m2}x ${sgn(b2)} intersect. What is the x-coordinate of the intersection?`, answer: x0,
+      exprs: [eqT(m1, b1), eqT(m2, b2)],
+      steps: ['Both lines are on the graph. The marked point is where they cross.', 'Read the x-coordinate of the marked point.', `By hand: set ${m1}x ${sgn(b1)} = ${m2}x ${sgn(b2)} and solve for x.`, `Result: x = ${x0}.`] };
+  },
+  ineq() {
+    let a = ri(-4, 4); if (!a) a = 2;
+    const x0 = ri(-5, 5), b = ri(-8, 8), c = a * x0 + b;
+    return { tag: 'Algebra', prompt: `Solve ${a}x ${sgn(b)} > ${c}. What is the boundary value of x, where the two sides are equal?`, answer: x0,
+      steps: [`Set the sides equal: ${a}x ${sgn(b)} = ${c}.`, `Subtract ${b}, then divide by ${a}: x = ${x0}.`, 'The boundary does not depend on the inequality sign. Only the direction of the shading does.'] };
+  },
+  rate() {
+    const r = ri(20, 60), t = ri(2, 6), t2 = ri(2, 8);
+    return { tag: 'Algebra', prompt: `A car travels ${r * t} miles in ${t} hours at a constant speed. How many hours does it take to travel ${r * t2} miles at the same speed?`, answer: t2,
+      steps: [`Speed = distance ÷ time = ${r * t} ÷ ${t} = ${r} mph.`, `Time = distance ÷ speed = ${r * t2} ÷ ${r}.`, `Result: ${t2} hours.`] };
+  },
+  percent() {
+    const B = ri(4, 40) * 5, p = ri(5, 40), ans = Math.round(B * (1 + p / 100) * 100) / 100;
+    return { tag: 'Algebra', prompt: `A price of $${B} increases by ${p}%. What is the new price, in dollars?`, answer: ans,
+      steps: [`Find the increase: ${B} × ${p}% = ${B * p / 100}.`, `Add it to the original: ${B} + ${B * p / 100} = ${ans}.`, `Equivalently, multiply by ${1 + p / 100}.`] };
+  },
+  roots() {
+    let r1 = ri(-5, 5), r2 = ri(-5, 5);
+    return { tag: 'Advanced Math', prompt: `The parabola y = (x ${sgn(-r1)})(x ${sgn(-r2)}) has two x-intercepts. What is their sum?`, answer: r1 + r2,
+      exprs: [`y = (x ${sgn(-r1)})(x ${sgn(-r2)})`],
+      steps: ['x-intercepts are where y = 0. Each factor gives one root.', `Solve x ${sgn(-r1)} = 0 and x ${sgn(-r2)} = 0, giving x = ${r1} and x = ${r2}.`, `Sum: ${r1} + ${r2} = ${r1 + r2}.`] };
+  },
+  vertex() {
+    const a = ri(1, 3), r1 = ri(-4, 4), r2 = r1 + 2 * ri(1, 3);
+    return { tag: 'Advanced Math', prompt: `The parabola y = ${a}(x ${sgn(-r1)})(x ${sgn(-r2)}) has a vertex. What is the x-coordinate of the vertex?`, answer: (r1 + r2) / 2,
+      exprs: [`y = ${a}(x ${sgn(-r1)})(x ${sgn(-r2)})`],
+      steps: ['The vertex sits halfway between the two x-intercepts, because the parabola is symmetric.', `Midpoint of ${r1} and ${r2}: (${r1} + ${r2}) ÷ 2 = ${(r1 + r2) / 2}.`, 'In Desmos, graph the function and read the lowest or highest point.'] };
+  },
+  nonlin() {
+    let r1 = ri(-4, 4), r2 = ri(-4, 4); if (r1 === r2) r2 = r1 + 1;
+    const m = r1 + r2, b = -r1 * r2;
+    return { tag: 'Advanced Math', prompt: `The parabola y = x² and the line ${eqT(m, b)} intersect at two points. What is the sum of their x-coordinates?`, answer: m,
+      exprs: ['y = x^2', eqT(m, b)],
+      steps: [`Set the two expressions equal: x² = ${m}x ${sgn(b)}.`, `Rearrange into standard form: x² ${sgn(-m)}x ${sgn(-b)} = 0.`, `For x² + px + q = 0, the roots sum to −p. Here p = ${-m}, so the sum is ${m}.`] };
+  },
+  growth() {
+    const P0 = ri(1, 10) * 100, rate = ri(1, 10), yrs = ri(2, 5), ans = Math.round(P0 * (1 + rate / 100) ** yrs);
+    return { tag: 'Advanced Math', prompt: `A population of ${P0} grows by ${rate}% each year. What is the population after ${yrs} years? Round to the nearest whole number.`, answer: ans,
+      steps: [`Each year multiplies by ${1 + rate / 100}.`, `After ${yrs} years: ${P0} × (${1 + rate / 100})^${yrs}.`, `Result: ${ans}.`] };
+  },
+  compose() {
+    const a = ri(-3, 3) || 2, b = ri(-5, 5), c = ri(-3, 3) || 2, d = ri(-5, 5), x0 = ri(-3, 3);
+    const gx = c * x0 + d;
+    return { tag: 'Advanced Math', prompt: `f(x) = ${a}x ${sgn(b)} and g(x) = ${c}x ${sgn(d)}. What is f(g(${x0}))?`, answer: a * gx + b,
+      steps: [`First evaluate g(${x0}) = ${c}(${x0}) ${sgn(d)} = ${gx}.`, `Then evaluate f(${gx}) = ${a}(${gx}) ${sgn(b)} = ${a * gx + b}.`, 'Work from the inside out.'] };
+  },
+  exprule() {
+    const a = ri(1, 6), b = ri(1, 6);
+    return { tag: 'Advanced Math', prompt: `Simplify: 2^${a} · 2^${b} = 2^k. What is k?`, answer: a + b,
+      steps: ['When multiplying powers with the same base, add the exponents.', `k = ${a} + ${b} = ${a + b}.`] };
+  },
+  expreg() {
+    const a = ri(1, 4), g = ri(2, 3), xs = [0, 1, 2, 3, 4];
+    return { tag: 'Advanced Math', prompt: 'Using exponential regression on the points in the table, predict y when x = 5.', answer: a * g ** 5,
+      pts: xs.map(x => [x, a * g ** x]), model: 'y1 ~ ab^x1',
+      steps: ['Each value multiplies by the same factor, so fit an exponential.', `Read the fit: a = ${a}, b = ${g}.`, `Substitute x = 5: y = ${a} · ${g}^5 = ${a * g ** 5}.`] };
+  },
+  quadreg() {
+    const p = ri(1, 2), q = ri(-3, 3), r = ri(-4, 4), xs = [0, 1, 2, 3, 4];
+    return { tag: 'Advanced Math', prompt: 'Using quadratic regression on the points in the table, predict y when x = 6.', answer: p * 36 + q * 6 + r,
+      pts: xs.map(x => [x, p * x * x + q * x + r]), model: 'y1 ~ ax1^2 + bx1 + c',
+      steps: ['The points curve, so fit a parabola with y1 ~ ax1^2 + bx1 + c.', `Read the fit: a = ${p}, b = ${q}, c = ${r}.`, `Substitute x = 6: y = ${p}(36) + ${q}(6) + ${r} = ${p * 36 + q * 6 + r}.`] };
+  },
+  linreg() {
+    const m = ri(1, 5) * (Math.random() < 0.5 ? -1 : 1), b = ri(-5, 5), xs = [1, 2, 3, 4, 5];
+    return { tag: 'Problem Solving & Data', prompt: 'Using linear regression on the points in the table, predict y when x = 10.', answer: m * 10 + b,
+      pts: xs.map(x => [x, m * x + b]), model: 'y1 ~ ax1 + b',
+      steps: ['The table holds the data. Type y1 ~ ax1 + b to fit a line.', `Read the fit: a = ${m}, b = ${b}.`, `Substitute x = 10: y = ${m}(10) + ${b} = ${m * 10 + b}.`] };
+  },
+  mean() {
+    const arr = Array.from({ length: 5 }, () => ri(1, 20)), sum = arr.reduce((a, b) => a + b, 0), ans = Math.round(sum / 5 * 100) / 100;
+    return { tag: 'Problem Solving & Data', prompt: `What is the mean of ${arr.join(', ')}?`, answer: ans,
+      steps: [`Sum: ${arr.join(' + ')} = ${sum}.`, `Divide by the count, 5: ${sum} ÷ 5 = ${ans}.`, 'In Desmos, mean(L) gives the same result.'] };
+  },
+  median() {
+    const arr = Array.from({ length: 7 }, () => ri(1, 20)), s = [...arr].sort((a, b) => a - b);
+    return { tag: 'Problem Solving & Data', prompt: `What is the median of ${arr.join(', ')}?`, answer: s[3],
+      steps: [`Sort the values: ${s.join(', ')}.`, 'There are 7 values, so the median is the 4th value.', `The 4th value is ${s[3]}.`] };
+  },
+  prob() {
+    const r = ri(2, 9), b = ri(2, 9), ans = Math.round(r / (r + b) * 1000) / 1000;
+    return { tag: 'Problem Solving & Data', prompt: `A bag has ${r} red and ${b} blue marbles. One is chosen at random. What is the probability it is red? Give a decimal to three places.`, answer: ans,
+      steps: [`Total marbles: ${r} + ${b} = ${r + b}.`, `Favorable outcomes: ${r} red.`, `Probability = ${r} ÷ ${r + b} = ${ans}.`] };
+  },
+  circc() {
+    const r = ri(2, 12);
+    return { tag: 'Geometry & Trig', prompt: `A circle has the equation (x − h)² + (y − k)² = c and a radius of ${r}. What is c?`, answer: r * r,
+      steps: ['The radius is the square root of the constant on the right side.', `So √c = ${r}.`, `Square both sides: c = ${r} × ${r} = ${r * r}.`] };
+  },
+  circa() {
+    const r = ri(2, 9), ans = Math.round(Math.PI * r * r * 100) / 100;
+    return { tag: 'Geometry & Trig', prompt: `A circle has radius ${r}. What is its area? Use π ≈ 3.14159 and round to two decimals.`, answer: ans,
+      steps: ['Area of a circle = πr².', `Substitute r = ${r}: π × ${r}² = π × ${r * r}.`, `Result: ${ans}.`] };
+  },
+  pyth() {
+    const T = pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25]]);
+    return { tag: 'Geometry & Trig', prompt: `A right triangle has legs ${T[0]} and ${T[1]}. What is the hypotenuse?`, answer: T[2],
+      steps: [`Use a² + b² = c²: ${T[0]}² + ${T[1]}² = ${T[0] ** 2} + ${T[1] ** 2} = ${T[2] ** 2}.`, `So c = √${T[2] ** 2} = ${T[2]}.`] };
+  },
+  sin() {
+    const T = pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25]]);
+    const ans = Math.round(T[0] / T[2] * 100) / 100;
+    return { tag: 'Geometry & Trig', prompt: `In a right triangle with legs ${T[0]} and ${T[1]} and hypotenuse ${T[2]}, let θ be the angle opposite the leg of length ${T[0]}. What is sin θ? Round to two decimals.`, answer: ans,
+      steps: ['sin θ = opposite ÷ hypotenuse.', `sin θ = ${T[0]} ÷ ${T[2]}.`, `Result: ${ans}.`] };
+  }
+};
+const TOPICS = [
+  ['Algebra', ['linear', 'sys', 'ineq', 'rate', 'percent']],
+  ['Advanced Math', ['roots', 'vertex', 'nonlin', 'growth', 'compose', 'exprule', 'expreg', 'quadreg']],
+  ['Problem Solving & Data', ['mean', 'median', 'prob', 'linreg']],
+  ['Geometry & Trig', ['circc', 'circa', 'pyth', 'sin']]
+];
+const ALL_KEYS = TOPICS.flatMap(([, k]) => k);
+let prWs, pr = null, prScore = [0, 0], prType = 'mix';
+function newProblem() {
+  let k;
+  if (prType === 'mix') k = pick(ALL_KEYS);
+  else if (prType.startsWith('grp:')) k = pick(TOPICS.find(([n]) => n === prType.slice(4))[1]);
+  else k = prType;
+  pr = Object.assign(GENS[k](), { revealed: 0, answered: false, counted: false });
+  renderPractice();
+}
+function renderPractice() {
+  $('#prScore').textContent = `${prScore[0]} / ${prScore[1]} correct`;
+  $('#prCard').innerHTML = `
+    <div class="tag">${pr.tag}</div>
+    <p class="prompt">${pr.prompt}</p>
+    <div class="answer"><input type="number" step="any" id="prAns" placeholder="Answer" aria-label="Answer"><button class="btn pri" id="prCheck">Check</button></div>
+    <div class="fb" id="prFb"></div>
+    <div class="btnrow"><button class="btn" id="prHint">Hint</button><button class="btn" id="prGuided">Guided solution</button><button class="btn" id="prNew">New problem</button></div>
+    <div class="hint" id="prHintBox" hidden></div>
+    <ol class="guide" id="prGuide"></ol>`;
+  pr.steps.forEach((s, i) => { const li = document.createElement('li'); li.textContent = s; li.hidden = i >= pr.revealed; $('#prGuide').appendChild(li); });
+  $('#prCheck').onclick = checkPractice;
+  $('#prAns').onkeydown = e => { if (e.key === 'Enter') checkPractice(); };
+  $('#prHint').onclick = () => { const h = $('#prHintBox'); h.hidden = false; h.textContent = 'Hint: ' + pr.steps[0]; };
+  $('#prGuided').onclick = revealNext;
+  $('#prNew').onclick = newProblem;
+  const hasGraph = !!(pr.exprs || pr.pts);
+  $('#pSplit').classList.toggle('single', !hasGraph);
+  $('#pGraphWrap').hidden = !hasGraph;
+  $('#pListWrap').hidden = !hasGraph;
+  if (hasGraph) loadProblemGraph();
+}
+function revealNext() {
+  const items = $$('#prGuide li');
+  if (pr.revealed < items.length) { items[pr.revealed].hidden = false; pr.revealed++; }
+  $('#prGuided').textContent = pr.revealed >= items.length ? 'All steps shown' : 'Reveal next step';
+}
+function checkPractice() {
+  const v = parseFloat($('#prAns').value), fb = $('#prFb');
+  if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Enter a number first.'; return; }
+  if (!pr.answered) { pr.answered = true; prScore[1]++; }
+  const ok = Math.abs(v - pr.answer) <= Math.max(0.01, Math.abs(pr.answer) * 0.005);
+  if (ok && !pr.counted) { prScore[0]++; pr.counted = true; }
+  fb.className = 'fb ' + (ok ? 'ok' : 'no');
+  fb.textContent = ok ? 'Correct.' : `Not quite. The answer is ${pr.answer}. Open the guided solution to see why.`;
+  $('#prScore').textContent = `${prScore[0]} / ${prScore[1]} correct`;
+}
+function loadProblemGraph() {
+  if (pr.exprs) prWs.load(pr.exprs.map(t => mk('expr', t)));
+  else prWs.load([mk('table', '', pr.pts.map(([a, b]) => [String(a), String(b)])), mk('expr', pr.model)]);
+}
+
+/* ---------- Tricks ---------- */
+const TRICKS = [
+  { g: 'Regression and tables', items: [
+    { t: 'Fit a model from a table', d: 'Type table, enter the points, then write y1 ~ ax1 + b. Desmos fits the parameters for you.', load: [{ table: [['1', '3'], ['2', '5'], ['3', '8'], ['4', '12']] }, 'y1 ~ ax1 + b'] },
+    { t: 'Compare linear and quadratic fits', d: 'Add both models to the same table. Pick the one with R² closer to 1, and check the residuals.', load: [{ table: [['1', '1'], ['2', '4'], ['3', '9'], ['4', '16'], ['5', '24']] }, 'y1 ~ ax1 + b', 'y1 ~ ax1^2 + bx1 + c'] },
+    { t: 'Recognize exponential data', d: 'Values that multiply by a fixed factor are exponential. Fit y1 ~ ab^x1 and predict the next value.', load: [{ table: [['0', '2'], ['1', '6'], ['2', '18'], ['3', '54']] }, 'y1 ~ ab^x1'] }
+  ] },
+  { g: 'Graphing shortcuts', items: [
+    { t: 'Read intersections directly', d: 'Graph both equations. The intersection point is the solution to the system, so no algebra is needed.', load: ['y = x + 1', 'y = -x + 5'] },
+    { t: 'Variables become sliders', d: 'Any letter besides x and y in an expression becomes a slider. Move it to see how the graph changes, which is useful for equivalent-expression questions.', load: ['y = ax^2 + bx + c'] },
+    { t: 'Shade inequalities', d: 'Type y > … or y < …. Desmos shades every point that satisfies the inequality.', load: ['y > 2x - 1'] },
+    { t: 'Find x-intercepts from factored form', d: 'Each factor gives one root. Graph the expression and read where it crosses the x-axis.', load: ['y = (x - 2)(x + 3)'] },
+    { t: 'Draw a circle from its center and radius', d: 'Use circle(h, k, r). The radius is the r you enter, and the constant in the equation is r².', load: ['circle(1, -2, 4)'] },
+    { t: 'Check every answer choice', d: 'For "which value works," graph each option or type it as a point. The correct one lands where the question requires.', load: [] }
+  ] },
+  { g: 'Strategy', items: [
+    { t: 'Zoom out to find every solution', d: 'Some systems cross far from the default window. Scroll out before you decide the answer is the only intersection.', load: [] },
+    { t: 'Median by sorting', d: 'For a short list, sort it by hand and read the middle term. Use median(L) only if the list is long.', load: [] },
+    { t: 'Use mean(L) for averages', d: 'Enter a list and use mean(L). It is faster than adding and dividing when the list has many values.', load: [] },
+    { t: 'Trust R², then check the residuals', d: 'R² near 1 suggests a good fit. A pattern in the residuals suggests the model type is wrong.', load: [] }
+  ] }
+];
+function renderTricks() {
+  const list = $('#tricksList'); list.innerHTML = '';
+  TRICKS.forEach(group => {
+    const g = document.createElement('div'); g.className = 'grp'; g.textContent = group.g; list.appendChild(g);
+    group.items.forEach(it => {
+      const row = document.createElement('div'); row.className = 'trick';
+      row.innerHTML = `<div><div class="t">${it.t}</div><div class="d">${it.d}</div></div>`;
+      if (it.load.length) {
+        const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Try';
+        b.onclick = () => { calcWs.load(it.load.map(x => typeof x === 'string' ? mk('expr', x) : mk('table', '', x.table.map(p => p.slice())))); setTab('calc'); };
+        row.appendChild(b);
+      }
+      list.appendChild(row);
+    });
+  });
+}
+
+/* ---------- Navigation ---------- */
+function setTab(name) {
+  $$('.view').forEach(v => v.classList.toggle('on', v.id === 't-' + name));
+  $$('.nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+  $('#main').classList.toggle('full', name === 'calc');
+  window.scrollTo({ top: 0 });
+  redrawAll();
+}
+$$('.nav button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+$$('#lessonSeg button').forEach(b => b.onclick = () => {
+  $$('#lessonSeg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  ['reg', 'sys', 'quad', 'ineq', 'circ'].forEach(k => { $('#l-' + k).hidden = k !== b.dataset.les; });
+  redrawAll();
+});
+function redrawAll() { GRAPHS.forEach(g => g.draw()); }
+window.addEventListener('resize', redrawAll);
+
+/* ---------- Calculator modes ---------- */
+$$('#calcSeg button').forEach(b => b.onclick = () => {
+  $$('#calcSeg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  $('#m-sat').hidden = b.dataset.mode !== 'sat';
+  $('#m-lab').hidden = b.dataset.mode !== 'lab';
+  redrawAll();
+});
+if (typeof math === 'undefined') showErr('The math engine (math.js) did not load, so lab expressions are disabled. The official SAT calculator still works.');
+
+/* ---------- Init ---------- */
+renderTricks();
+const regWs = Workspace($('#rList'), $('#rGraph'), {
+  init: [mk('table', '', [['1', '3'], ['2', '5'], ['3', '8'], ['4', '12'], ['5', '17']])]
+});
+regWs.listeners.push(renderRegSteps);
+renderRegSteps(regWs);
+
+sliders($('#sysSliders'), [['m1', 'Line 1 slope m₁', -3, 3, 0.5], ['b1', 'Line 1 intercept b₁', -6, 6, 0.5], ['m2', 'Line 2 slope m₂', -3, 3, 0.5], ['b2', 'Line 2 intercept b₂', -6, 6, 0.5]], SYS, updateSys);
+sliders($('#quadSliders'), [['r1', 'Root r₁', -5, 5, 1], ['r2', 'Root r₂', -5, 5, 1]], QD, updateQuad);
+sliders($('#ineqSliders'), [['m', 'Slope m', -3, 3, 0.5], ['b', 'Intercept b', -6, 6, 0.5]], INQ, updateIneq);
+sliders($('#circSliders'), [['h', 'Center x, h', -6, 6, 0.5], ['k', 'Center y, k', -6, 6, 0.5], ['r', 'Radius r', 0.5, 8, 0.5]], CIR, updateCirc);
+updateSys(); updateQuad(); updateIneq(); updateCirc();
+
+prWs = Workspace($('#pList'), $('#pGraph'));
+const sel = $('#prSel');
+{
+  const o = document.createElement('option'); o.value = 'mix'; o.textContent = 'Mix of everything'; sel.appendChild(o);
+  TOPICS.forEach(([name, keys]) => {
+    const og = document.createElement('optgroup'); og.label = name;
+    const all = document.createElement('option'); all.value = 'grp:' + name; all.textContent = `All ${name}`; og.appendChild(all);
+    keys.forEach(k => { const op = document.createElement('option'); op.value = k; op.textContent = '   ' + ({ linear: 'Linear equations', sys: 'Systems', ineq: 'Inequalities', rate: 'Rates', percent: 'Percent change', roots: 'Roots', vertex: 'Vertex', nonlin: 'Line and parabola', growth: 'Exponential growth', compose: 'Function composition', exprule: 'Exponent rules', expreg: 'Exponential regression', quadreg: 'Quadratic regression', mean: 'Mean', median: 'Median', prob: 'Probability', linreg: 'Linear regression', circc: 'Circle equation', circa: 'Circle area', pyth: 'Pythagorean theorem', sin: 'Sine ratio' })[k]; og.appendChild(op); });
+    sel.appendChild(og);
+  });
+}
+sel.onchange = e => { prType = e.target.value; newProblem(); };
+newProblem();
+
+const calcWs = Workspace($('#cList'), $('#cGraph'), {
+  predict: true,
+  init: [mk('table', '', [['1', '2'], ['2', '4'], ['3', '7'], ['4', '9'], ['5', '13']]), mk('expr', 'y1 ~ ax1 + b')]
+});
+['y = 2x + 1', 'y = x^2 - 4', 'y > x - 1', 'y = sqrt(x)', 'x = 2', '(3, 4)', 'y1 ~ ax1^2 + bx1 + c', 'table'].forEach(t => {
+  const c = document.createElement('button'); c.className = 'chip'; c.textContent = t;
+  c.onclick = () => calcWs.add(t === 'table' ? 'table' : 'expr', t === 'table' ? '' : t);
+  $('#chips').appendChild(c);
+});
+</script>
+</body>
+</html>
