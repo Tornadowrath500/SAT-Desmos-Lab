@@ -177,8 +177,9 @@ const LESSONS=[
  {t:'Tap the vertex',d:'What is the minimum value of y?',ask:{a:-9}}]},
 {id:'ineq',t:'Inequalities',s:'Shaded regions and test points',steps:[
  {t:'Graph the region',d:'Load two inequalities. The overlap of the shading is the solution set.',set:()=>load(['y>2x-3','y<-x+6'],{left:-4,right:8,bottom:-6,top:8}),btn:'Load inequalities',check:()=>latexes().length>=2},
- {t:'Find the corner',d:'The boundary lines meet at a corner. What is its x-coordinate?',ask:{a:3}},
- {t:'Test a point',d:'Type the point (2,3) in a new line. Is it inside the overlapping shaded region? Enter 1 for yes, 0 for no.',ask:{a:1}}]},
+ {t:'Find the corner',d:'The boundary lines meet at a corner. What is its x-coordinate? (The corner itself is not shaded, because the inequalities are strict.)',ask:{a:3}},
+ {t:'Test a point',d:'Type the point (2,3) in a new line. It is inside the overlap only if BOTH hold: 3 > 2(2) − 3 and 3 < −2 + 6. Is it inside? Enter 1 for yes, 0 for no.',ask:{a:1}},
+ {t:'Test a failing point',d:'Now type (4,0). Check y > 2x − 3: is 0 > 5? Is (4,0) in the overlap? Enter 1 for yes, 0 for no.',ask:{a:0}}]},
 {id:'circ',t:'Circles',s:'Center and radius from the equation',steps:[
  {t:'Graph the circle',d:'Load (x − 2)² + (y + 1)² = 25.',set:()=>load(['(x-2)^2+(y+1)^2=25'],{left:-9,right:13,bottom:-9,top:9}),btn:'Load circle',check:()=>latexes().length>=1},
  {t:'Read the radius',d:'How long is the radius? Use the graph, or take the square root of 25.',ask:{a:5}},
